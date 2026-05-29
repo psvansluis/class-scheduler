@@ -43,6 +43,12 @@ jobs:
       - name: Validate TypeScript and Vue Templates
         run: npx vue-tsc --noEmit
 
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Run Integration Tests
+        run: npx playwright test
+
       - name: Build Project
         run: npm run build
 
