@@ -19,7 +19,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 // Import Tau-Prolog core. It initializes itself on the global scope.
-const pl = (window as any).pl;
+const pl = window.pl;
 
 const result = ref<string | null>(null);
 

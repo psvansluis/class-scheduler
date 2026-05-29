@@ -1,1 +1,3 @@
-declare module "tau-prolog";
+interface Window {
+  pl: any;
+}
