@@ -3,45 +3,95 @@ import vue from "@vitejs/plugin-vue";
 import fs from "fs";
 import path from "path";
 
+// --- CONFIGURATION MANAGEMENT ---
+const resolvePath = (p: string) => path.resolve(__dirname, p);
+
+interface AssetMap {
+  virtualRoute: string; // The URL sub-path the browser requests
+  srcDir: string; // Physical source location in workspace
+  distDir: string; // Physical target location in production build
+  files: string[]; // List of specific assets to track
+  contentType: string; // HTTP header content-type for dev server
+}
+
+const PROLOG_ASSET_MANIFEST: AssetMap[] = [
+  {
+    virtualRoute: "/vendor/tau-prolog/",
+    srcDir: resolvePath("node_modules/tau-prolog/modules"),
+    distDir: resolvePath("dist/vendor/tau-prolog"),
+    files: ["core.js", "lists.js"],
+    contentType: "application/javascript",
+  },
+  {
+    virtualRoute: "/prolog/",
+    srcDir: resolvePath("prolog"),
+    distDir: resolvePath("dist/prolog"),
+    files: ["rules.pl"],
+    contentType: "text/plain",
+  },
+];
+
+const serveStaticFile = (
+  res: any,
+  filePath: string,
+  contentType: string,
+): boolean => {
+  if (fs.existsSync(filePath)) {
+    res.setHeader("Content-Type", contentType);
+    res.end(fs.readFileSync(filePath));
+    return true;
+  }
+  return false;
+};
+
+const copySingleAsset = (srcDir: string, destDir: string, file: string) => {
+  fs.mkdirSync(destDir, { recursive: true });
+  fs.copyFileSync(path.join(srcDir, file), path.join(destDir, file));
+};
+
 export default defineConfig({
   plugins: [
     vue(),
     {
-      name: "serve-tau-prolog-locally",
-      // 1. This handles "npm run dev" (Local Development)
+      name: "serve-and-build-prolog",
+
+      // 1. Local Development (Declarative Lookup)
       configureServer(server) {
         server.middlewares.use((req, res, next) => {
-          if (req.url && req.url.includes("/vendor/tau-prolog/")) {
-            const fileName = req.url.split("/").pop()?.split("?")[0];
-            const filePath = path.resolve(
-              __dirname,
-              `node_modules/tau-prolog/modules/${fileName}`,
-            );
+          if (!req.url) return next();
 
-            if (fs.existsSync(filePath)) {
-              res.setHeader("Content-Type", "application/javascript");
-              res.end(fs.readFileSync(filePath));
-              return;
-            }
+          const fileName = req.url.split("/").pop()?.split("?")[0] || "";
+
+          const matched = PROLOG_ASSET_MANIFEST.find(
+            (asset) =>
+              req.url!.includes(asset.virtualRoute) &&
+              asset.files.includes(fileName),
+          );
+
+          if (
+            matched &&
+            serveStaticFile(
+              res,
+              path.join(matched.srcDir, fileName),
+              matched.contentType,
+            )
+          ) {
+            return; // Request handled cleanly by utility
           }
+
           next();
         });
       },
-      // 2. This handles "npm run build" (Production Deployment for GitHub Actions)
-      closeBundle() {
-        const srcDir = path.resolve(
-          __dirname,
-          "node_modules/tau-prolog/modules",
-        );
-        const destDir = path.resolve(__dirname, "dist/vendor/tau-prolog");
 
-        if (fs.existsSync(srcDir)) {
-          fs.mkdirSync(destDir, { recursive: true });
-          const files = ["core.js", "lists.js"]; // Add any other modules you need here
-          files.forEach((file) => {
-            fs.copyFileSync(path.join(srcDir, file), path.join(destDir, file));
-          });
-        }
+      // 2. Production Build Output (Declarative Stream)
+      closeBundle() {
+        PROLOG_ASSET_MANIFEST.filter((asset) =>
+          fs.existsSync(asset.srcDir),
+        ).forEach((asset) =>
+          asset.files.forEach((file) =>
+            copySingleAsset(asset.srcDir, asset.distDir, file),
+          ),
+        );
       },
     },
   ],

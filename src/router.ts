@@ -1,3 +1,4 @@
+declare module "vue-router";
 import {
   createRouter,
   createWebHashHistory,

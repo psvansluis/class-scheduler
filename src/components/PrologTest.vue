@@ -1,101 +1,49 @@
 <template>
   <div class="prolog-test">
-    <h3>Prolog Integration Test</h3>
-
-    <div class="status-box">
-      <p><strong>Database:</strong> <code>say_hello(world).</code></p>
-      <p><strong>Query:</strong> <code>say_hello(X).</code></p>
-
-      <button @click="runTest">Execute Query</button>
-    </div>
-
-    <div v-if="result" class="result-box">
-      <p><strong>Result:</strong> X = {{ result }}</p>
-      <p class="success-msg">✅ Tau-Prolog integration is working perfectly!</p>
-    </div>
+    <h3>Decoupled Prolog Test</h3>
+    <button @click="runTest">Load & Run Solver</button>
+    <p v-if="result" class="result-box">Result: {{ result }}</p>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue";
-// Import Tau-Prolog core. It initializes itself on the global scope.
-const pl = window.pl;
 
+const pl = (window as any).pl;
 const result = ref<string | null>(null);
 
-const runTest = () => {
-  // 1. Create a new Prolog session
-  const session = pl.create();
+const runTest = async () => {
+  // 1. Fetch the physical .pl file from the server
+  const response = await fetch("./prolog/rules.pl");
+  const programText = await response.text();
 
-  // 2. Define your knowledge base (rules and facts)
-  const program = `
-    say_hello(world).
-    say_hello(vue_and_typescript).
+  // 2. Dynamic runtime data injection (simulating form inputs)
+  const dynamicFacts = `
+    teacher_skill(mr_jansen, chemistry).
+    course_requires(organic_chemistry_101, chemistry).
   `;
 
-  // 3. Consult (load) the program into the session
-  session.consult(program, {
+  const session = pl.create();
+
+  // Combine the file content with user inputs
+  session.consult(programText + dynamicFacts, {
     success: () => {
-      // 4. Query the session once consulting succeeds
-      session.query("say_hello(X).", {
+      session.query("can_teach(mr_jansen, organic_chemistry_101).", {
         success: () => {
-          // 5. Look for the first answer
           session.answer({
             success: (answer: any) => {
-              // Extract the value bound to the variable 'X'
-              // Tau-Prolog represents values as objects; .id extracts standard terms
-              const binding = answer.links["X"];
-              result.value = binding.id;
+              // If substitution links are empty but success is triggered,
+              // it implies a true/false query succeeded cleanly.
+              console.log(answer);
+              result.value = "Success! Mr. Jansen can teach the class.";
             },
-            error: (err: any) => {
-              console.error("Query answer error:", err);
+            fail: () => {
+              result.value = "Failed: Constraints violated.";
             },
           });
         },
-        error: (err: any) => {
-          console.error("Query compilation error:", err);
-        },
       });
-    },
-    error: (err: any) => {
-      console.error("Consultation syntax error:", err);
     },
   });
 };
 </script>
-
-<style scoped>
-.prolog-test {
-  border: 1px solid #ccc;
-  padding: 1.5rem;
-  border-radius: 8px;
-  background-color: #f9f9f9;
-  max-width: 500px;
-  margin: 1rem auto;
-}
-.status-box {
-  margin-bottom: 1rem;
-}
-button {
-  background-color: #42b983;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  cursor: pointer;
-}
-button:hover {
-  background-color: #35495e;
-}
-.result-box {
-  margin-top: 1rem;
-  padding: 0.5rem;
-  background-color: #e6f7ff;
-  border: 1px solid #91d5ff;
-  border-radius: 4px;
-}
-.success-msg {
-  color: #52c41a;
-  font-weight: bold;
-}
-</style>

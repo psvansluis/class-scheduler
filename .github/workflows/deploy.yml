@@ -46,7 +46,7 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
-      - name: Run Integration Tests
+      - name: Run End-to-end Tests
         run: npx playwright test
 
       - name: Build Project
