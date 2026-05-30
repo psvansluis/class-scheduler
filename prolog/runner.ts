@@ -4,64 +4,62 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-// 1. Initialize session container
 const session = pl.create();
 
-// 2. Read the source file from disk
+// 1. Read core rules
 const rulesPath = path.resolve(__dirname, "rules.pl");
-const rulesSource = fs.readFileSync(rulesPath, "utf8");
+const coreRules = fs.readFileSync(rulesPath, "utf8");
 
-console.log("=== 1. Submitting Rules to Compiler ===");
+// 2. Inject localized test data representing a matching skill scenario
+const mockTestData = `
+    teacher_skill(mr_jansen, math).
+    course_requires(algebra, math).
+`;
 
-// 3. Consult the engine and WAIT for the success callback to fire safely
-session.consult(rulesSource, {
+console.log("=== 1. Compiling Rules + Mock Test Data ===");
+
+session.consult(coreRules + mockTestData, {
   success: () => {
-    console.log("✅ Compilation complete. Safe async context entered.\n");
-    runSafeDiagnostics();
+    console.log("✅ Engine compiled seamlessly.");
+    runSingleTestAssertion();
   },
   error: (err) => {
-    console.error("❌ Syntax compilation error:", err.toString());
+    console.error("❌ Compilation error:", err.toString());
   },
 });
 
-function runSafeDiagnostics() {
-  console.log("=== 2. Querying Engine via Public API ===");
+function runSingleTestAssertion() {
+  const targetQuery = "can_teach(mr_jansen, algebra).";
+  console.log(`\n=== 2. Running Assertion Query: ${targetQuery} ===`);
 
-  // We ask Prolog to find all user-defined predicates matching Name/Arity
-  // This query is fully async-safe because it executes inside the compiled context.
-  session.query("current_predicate(Name/Arity).", {
+  session.query(targetQuery, {
     success: () => {
-      // Fetch the first answer from the engine stream
-      getNextAnswer();
+      // Check the answer stream pointer
+      session.answer({
+        success: (answer) => {
+          // This block ONLY fires if Prolog successfully finds a derivation path (True)
+          console.log("✅ TEST PASSED: Mr. Jansen can teach Algebra.");
+          process.exit(0); // Exit code 0 signals a healthy green pipeline
+        },
+        fail: () => {
+          // This fires if the constraints are violated or unprovable (False)
+          console.error(
+            "❌ TEST FAILED: The engine evaluated the query to 'false'.",
+          );
+          process.exit(1); // Exit code 1 flags the failure to GitHub Actions
+        },
+        error: (err) => {
+          console.error(
+            "💥 TEST CRASHED: A runtime exception occurred:",
+            err.toString(),
+          );
+          process.exit(1);
+        },
+      });
     },
     error: (err) => {
-      console.error("❌ Query initiation failed:", err.toString());
-    },
-  });
-}
-
-function getNextAnswer() {
-  session.answer({
-    success: (answer) => {
-      // Extract the variable bindings from the substitution object
-      const name = answer.lookup("Name").id;
-      const arity = answer.lookup("Arity").value;
-
-      // Filter out internal system terms, displaying only our domain logic
-      if (name !== "current_predicate" && name !== "consult") {
-        console.log(`   👉 Found Predicate: ${name}/${arity}`);
-      }
-
-      // Loop to get the next bound predicate from the pointer stream
-      getNextAnswer();
-    },
-    fail: () => {
-      // The pointer stream cleanly hits 'fail' when there are no more predicates left
-      console.log("\n=== 3. End of Diagnostic Run ===");
-    },
-    error: (err) => {
-      console.error("❌ Runtime exception during streaming:", err.toString());
+      console.error("❌ Query structural parsing failed:", err.toString());
+      process.exit(1);
     },
   });
 }
