@@ -1,0 +1,21 @@
+{
+  "root": [
+    "./playwright.config.ts",
+    "./vite.config.ts",
+    "./e2e/prolog.spec.ts",
+    "./e2e/routing.spec.ts",
+    "./prolog/assert.ts",
+    "./prolog/ast.ts",
+    "./prolog/runner.ts",
+    "./prolog/types.ts",
+    "./src/app.vue",
+    "./src/main.ts",
+    "./src/router.ts",
+    "./src/tau-prolog.d.ts",
+    "./src/components/prologtest.vue",
+    "./src/components/scheduleresult.vue",
+    "./src/components/schedulerform.vue"
+  ],
+  "errors": true,
+  "version": "6.0.3"
+}
