@@ -1,52 +1,28 @@
-import pl from "tau-prolog";
+import swipl from "swipl-wasm";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import { runIsolatedAssert } from "./assert.js";
-import { extractSpecification } from "./ast.js";
-import { success, failure } from "./types.js";
-import type { Result } from "./types.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /**
- * Streams through discovery queries and accumulates specifications iteratively.
+ * Executes a Prolog query and safely ensures the engine stream finishes
+ * compiling/evaluating before releasing the JS thread promise wrapper.
  */
-function harvestManifestSpecs(discoverySession: any): Promise<Result<any[]>> {
-  return new Promise((resolve) => {
-    const specs: any[] = [];
-
-    discoverySession.query("spec(Id, Desc, Facts, Query, Expected).", {
-      success: () => {
-        const fetchNext = () => {
-          discoverySession.answer({
-            success: (answer: any) => {
-              specs.push(extractSpecification(answer));
-              fetchNext(); // Continue streaming pointer
-            },
-            fail: () => resolve(success(specs)), // Stream completed naturally
-            error: (err: any) =>
-              resolve(
-                failure(`Manifest query loop exception: ${err.toString()}`),
-              ),
-          });
-        };
-        fetchNext();
-      },
-      error: (err: any) =>
-        resolve(
-          failure(
-            `Invalid query initialization inside tests.pl: ${err.toString()}`,
-          ),
-        ),
-    });
-  });
+async function executeQuery(
+  engine: any,
+  queryString: string,
+): Promise<{ success: boolean }> {
+  const query = await engine.prolog.query(queryString);
+  const result = await query.once();
+  await query.close(); // Cleanly dispose the engine's current query thread handle
+  return result;
 }
 
-/**
- * Main application runner loop orchestrator.
- */
 async function main(): Promise<void> {
+  console.log("🏁 Initializing SWI-Prolog WebAssembly Engine...");
+  const SWI = await swipl();
+
   const coreRulesText = fs.readFileSync(
     path.resolve(__dirname, "rules.pl"),
     "utf8",
@@ -56,59 +32,36 @@ async function main(): Promise<void> {
     "utf8",
   );
 
-  console.log("🔍 Initializing test manifest parsing context...");
-  const discoverySession = pl.create();
+  console.log("📂 Mounting code into WASM Virtual Filesystem...");
+  SWI.FS.writeFile("/rules.pl", coreRulesText);
+  SWI.FS.writeFile("/tests.pl", testManifestText);
 
-  // Consult the tests specification file
-  const manifestLoadResult = await new Promise<Result<any[]>>((resolve) => {
-    discoverySession.consult(testManifestText, {
-      success: () => resolve(harvestManifestSpecs(discoverySession)),
-      error: (err: any) =>
-        resolve(
-          failure(`Failed to parse tests.pl syntax layout: ${err.toString()}`),
-        ),
-    });
-  });
+  console.log("🔨 Compiling Prolog source contexts...");
 
-  if (manifestLoadResult.tag === "failure") {
-    console.error(`❌ Suite Initialization Error: ${manifestLoadResult.error}`);
-    process.exit(1);
-  }
+  // Explicitly await the closing of the compilation stream for rules.pl
+  await executeQuery(SWI, "consult('/rules.pl').");
 
-  const testSuite = manifestLoadResult.value;
-  console.log(
-    `🚀 Collected ${testSuite.length} specifications. Executing test operations...\n`,
-  );
+  // Explicitly await the closing of the compilation stream for tests.pl
+  await executeQuery(SWI, "consult('/tests.pl').");
 
-  let suitePassed = true;
+  console.log("🏃 Executing PlUnit Specification Suite...\n");
 
-  for (let i = 0; i < testSuite.length; i++) {
-    const spec = testSuite[i];
-    console.log(`🏃 Running Test [${i + 1}]: ${spec.description}...`);
-
-    const runResult = await runIsolatedAssert(coreRulesText, spec);
-
-    if (runResult.tag === "success" && runResult.value === true) {
-      console.log("   ✅ PASSED\n");
-    } else if (runResult.tag === "success" && runResult.value === false) {
-      console.log(`   ❌ FAILED (Assertion output did not meet expectation)\n`);
-      suitePassed = false;
-    } else if (runResult.tag === "failure") {
-      console.log(`   💥 CRASHED: ${runResult.error}\n`);
-      suitePassed = false;
-    }
-  }
+  // Execute the test framework cleanly inside its own isolated timeline
+  const testExecution = await executeQuery(SWI, "run_tests.");
 
   console.log(`==============================================`);
-  if (suitePassed) {
-    console.log(`🎉 Success! All ${testSuite.length} specifications passed.`);
+  if (testExecution.success) {
+    console.log("🎉 Success! All native PlUnit specifications passed cleanly.");
     process.exit(0);
   } else {
     console.error(
-      "💥 Suite failure: Some specifications failed to compile or run.",
+      "💥 Suite failure: Some PlUnit assertions failed or errored.",
     );
     process.exit(1);
   }
 }
 
-main();
+main().catch((err) => {
+  console.error("💥 Critical Engine Panic:", err);
+  process.exit(1);
+});
