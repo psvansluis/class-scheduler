@@ -5,10 +5,6 @@ import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-/**
- * Executes a Prolog query and safely ensures the engine stream finishes
- * compiling/evaluating before releasing the JS thread promise wrapper.
- */
 async function executeQuery(
   engine: any,
   queryString: string,
@@ -19,36 +15,31 @@ async function executeQuery(
   return result;
 }
 
-const readAndConsultPrologFile = async (engine: any, fileName: string) => {
-  const filePath = path.resolve(__dirname, fileName);
-  const fileContent = fs.readFileSync(filePath, "utf8");
-  engine.FS.writeFile(`/${fileName}`, fileContent);
-  await executeQuery(engine, `consult('/${fileName}').`);
-};
+const readFile = (fileName: string): string =>
+  fs.readFileSync(path.resolve(__dirname, fileName), "utf8");
 
 async function main(): Promise<void> {
   console.log("🏁 Initializing SWI-Prolog WebAssembly Engine...");
   const SWI = await swipl();
 
-  for (const file of ["rules.pl", "tests.pl"]) {
-    console.log(`📂 Loading Prolog file: ${file}`);
-    await readAndConsultPrologFile(SWI, file);
-  }
+  const coreRulesText = readFile("rules.pl");
+  const testManifestText = readFile("tests.pl");
 
-  console.log("🏃 Executing PlUnit Specification Suite...\n");
+  const unifiedTestSuite = `${coreRulesText}\n\n${testManifestText}`;
+  SWI.FS.writeFile("/test_suite.pl", unifiedTestSuite);
+  await executeQuery(SWI, "consult('/test_suite.pl').");
+
+  console.log("Executing PlUnit Specification Suite...\n");
 
   const testExecution = await executeQuery(SWI, "run_tests.");
 
   console.log(`==============================================`);
-  if (testExecution.success) {
-    console.log("🎉 Success! All native PlUnit specifications passed cleanly.");
-    process.exit(0);
-  } else {
-    console.error(
-      "💥 Suite failure: Some PlUnit assertions failed or errored.",
-    );
-    process.exit(1);
-  }
+  const [msg, exitCode] = testExecution.success
+    ? ["🎉 Success! All native PlUnit specifications passed cleanly.", 0]
+    : ["💥 Suite failure: Some PlUnit assertions failed or errored.", 1];
+
+  console.log(msg);
+  process.exit(exitCode);
 }
 
 main().catch((err) => {

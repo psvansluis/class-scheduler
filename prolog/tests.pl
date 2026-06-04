@@ -1,22 +1,42 @@
 :- use_module(library(plunit)).
-:- use_module('/rules.pl').
 
-% Clean up the targeted module space explicitly
-cleanup_db :-
-    retractall(rules:teacher_skill(_, _)),
-    retractall(rules:course_requires(_, _)).
+:- dynamic teacher_skill/2.
+:- dynamic course_requires/2.
 
-:- begin_tests(scheduling_domain_tests, [cleanup(cleanup_db)]).
+% Explicitly scrub the global user namespace clean
+clear_db :-
+    retractall(user:teacher_skill(_, _)),
+    retractall(user:course_requires(_, _)).
+
+% The macro helper - now automatically forces a clear_db before injecting new facts!
+given(Facts) :-
+    clear_db,
+    inject_facts(Facts).
+
+inject_facts([]) :- !.
+inject_facts([Fact|Facts]) :-
+    asserta(user:Fact),
+    inject_facts(Facts).
+
+% No more attributes on the block header—keeping it completely vanilla
+:- begin_tests(scheduling_domain_tests).
+
+test(empty_database_returns_false, [fail]) :-
+    given([]),
+    can_teach(_, _).
 
 test(skills_match, [true(Teacher == mr_jansen)]) :-
-    % Force facts directly into the rules module scope
-    asserta(rules:teacher_skill(mr_jansen, math)),
-    asserta(rules:course_requires(algebra, math)),
+    given([
+        teacher_skill(mr_jansen, math),
+        course_requires(algebra, math)
+    ]),
     can_teach(Teacher, algebra).
 
 test(skills_mismatch, [fail]) :-
-    asserta(rules:teacher_skill(mr_jansen, math)),
-    asserta(rules:course_requires(lab_chemistry, chemistry)),
+    given([
+        teacher_skill(mr_jansen, math),
+        course_requires(lab_chemistry, chemistry)
+    ]),
     can_teach(mr_jansen, lab_chemistry).
 
 :- end_tests(scheduling_domain_tests).
