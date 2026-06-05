@@ -16,13 +16,6 @@ interface AssetMap {
 
 const PROLOG_ASSET_MANIFEST: AssetMap[] = [
   {
-    virtualRoute: "/vendor/tau-prolog/",
-    srcDir: resolvePath("node_modules/tau-prolog/modules"),
-    distDir: resolvePath("dist/vendor/tau-prolog"),
-    files: ["core.js", "lists.js"],
-    contentType: "application/javascript",
-  },
-  {
     virtualRoute: "/prolog/",
     srcDir: resolvePath("prolog"),
     distDir: resolvePath("dist/prolog"),

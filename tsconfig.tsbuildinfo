@@ -11,7 +11,6 @@
     "./src/app.vue",
     "./src/main.ts",
     "./src/router.ts",
-    "./src/tau-prolog.d.ts",
     "./src/components/prologtest.vue",
     "./src/components/scheduleresult.vue",
     "./src/components/schedulerform.vue"

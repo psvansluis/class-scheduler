@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("Prolog Integration Engine", () => {
-  test("should load the website and successfully execute a Tau-Prolog query", async ({
+  test("should load the website and successfully execute a SWI-Prolog query", async ({
     page,
   }) => {
     await page.goto("./");

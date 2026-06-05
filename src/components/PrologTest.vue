@@ -8,9 +8,18 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-
-const pl = (window as any).pl;
+import swipl from "swipl-wasm";
 const result = ref<string | null>(null);
+
+async function executeQuery(
+  engine: any,
+  queryString: string,
+): Promise<{ success: boolean }> {
+  const query = await engine.prolog.query(queryString);
+  const result = await query.once();
+  await query.close();
+  return result;
+}
 
 const runTest = async () => {
   // 1. Fetch the physical .pl file from the server
@@ -23,27 +32,23 @@ const runTest = async () => {
     course_requires(organic_chemistry_101, chemistry).
   `;
 
-  const session = pl.create();
+  const combinedRules = programText + "\n\n" + dynamicFacts;
 
-  // Combine the file content with user inputs
-  session.consult(programText + dynamicFacts, {
-    success: () => {
-      session.query("can_teach(mr_jansen, organic_chemistry_101).", {
-        success: () => {
-          session.answer({
-            success: (answer: any) => {
-              // If substitution links are empty but success is triggered,
-              // it implies a true/false query succeeded cleanly.
-              console.log(answer);
-              result.value = "Success! Mr. Jansen can teach the class.";
-            },
-            fail: () => {
-              result.value = "Failed: Constraints violated.";
-            },
-          });
-        },
-      });
-    },
-  });
+  const swi = await swipl();
+
+  swi.FS.writeFile("/rules.pl", combinedRules);
+
+  await executeQuery(swi, "consult('/rules.pl').");
+
+  const canTeach = await executeQuery(
+    swi,
+    "can_teach(mr_jansen, organic_chemistry_101).",
+  );
+
+  console.log({ canTeachResult: canTeach });
+
+  result.value = canTeach.success
+    ? "Success! Mr. Jansen can teach the class."
+    : "Failed: Constraints violated.";
 };
 </script>

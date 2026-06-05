@@ -5,6 +5,10 @@ import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+const underscore = (s: string): string => `\x1b[4m${s}\x1b[0m`;
+
+const log = (s: string): void => console.log("\n" + underscore(s));
+
 async function executeQuery(
   engine: any,
   queryString: string,
@@ -19,26 +23,23 @@ const readFile = (fileName: string): string =>
   fs.readFileSync(path.resolve(__dirname, fileName), "utf8");
 
 async function main(): Promise<void> {
-  console.log("🏁 Initializing SWI-Prolog WebAssembly Engine...");
-  const SWI = await swipl();
-
+  log("📂 Loading Prolog Rules and Test Manifest...");
   const coreRulesText = readFile("rules.pl");
   const testManifestText = readFile("tests.pl");
+  const testSuite = `${coreRulesText}\n\n${testManifestText}`;
 
-  const unifiedTestSuite = `${coreRulesText}\n\n${testManifestText}`;
-  SWI.FS.writeFile("/test_suite.pl", unifiedTestSuite);
-  await executeQuery(SWI, "consult('/test_suite.pl').");
+  log("🚀 Initializing SWI-Prolog WebAssembly Engine...");
+  const swi = await swipl();
+  swi.FS.writeFile("/test_suite.pl", testSuite);
+  await executeQuery(swi, "consult('/test_suite.pl').");
 
-  console.log("Executing PlUnit Specification Suite...\n");
+  log("Executing PlUnit Specification Suite...");
+  const testExecution = await executeQuery(swi, "run_tests.");
 
-  const testExecution = await executeQuery(SWI, "run_tests.");
-
-  console.log(`==============================================`);
   const [msg, exitCode] = testExecution.success
-    ? ["🎉 Success! All native PlUnit specifications passed cleanly.", 0]
-    : ["💥 Suite failure: Some PlUnit assertions failed or errored.", 1];
-
-  console.log(msg);
+    ? ["✅ Success! All PlUnit assertions passed.", 0]
+    : ["❌ Failure! Some PlUnit assertions failed or errored.", 1];
+  log("Test Execution Summary:\n" + msg);
   process.exit(exitCode);
 }
 
