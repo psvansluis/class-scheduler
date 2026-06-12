@@ -17,18 +17,26 @@ export async function executeClosedQuery<Q extends string = string>(
   return result?.success === true;
 }
 
+type TypedOrUntypedOpenQuery<T, Q extends string> =
+  Record<string, unknown> extends T
+    ? HasVariables<Q>
+    : SameSet<QueryVariables<Q>, Extract<keyof T, string>>;
+
+type GetOpenQueryErrorMessage<T, Q extends string> =
+  Record<string, unknown> extends T
+    ? "Open queries must contain at least one uppercase variable."
+    : `Variable mismatch. Query contains [${Extract<QueryVariables<Q>, string>}], but interface expects [${Extract<keyof T, string>}]`;
+
+export type ValidateOpenQueryString<T, Q extends string> =
+  TypedOrUntypedOpenQuery<T, Q> extends true
+    ? Q
+    : GetOpenQueryErrorMessage<T, Q>;
+
 export function executeOpenQuery<
   T extends Record<string, any> = Record<string, unknown>,
 >(engine: any) {
   return async function* <Q extends string>(
-    queryString: Q &
-      (Record<string, unknown> extends T
-        ? HasVariables<Q> extends true
-          ? Q
-          : "❌ Type Error: Open queries must contain at least one uppercase variable."
-        : SameSet<QueryVariables<Q>, Extract<keyof T, string>> extends true
-          ? Q
-          : `❌ Type Error: Variable mismatch. The query contains variables [${Extract<QueryVariables<Q>, string>}], but your interface expects: [${Extract<keyof T, string>}]`),
+    queryString: ValidateOpenQueryString<T, Q>,
   ): AsyncGenerator<
     { bindings: Record<string, unknown> extends T ? QueryBindings<Q> : T },
     void,

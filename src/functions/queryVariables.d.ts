@@ -1,7 +1,3 @@
-// ---------------------------------------------------------------------
-// Character classes
-// ---------------------------------------------------------------------
-
 type Lower =
   | "a"
   | "b"
@@ -37,10 +33,6 @@ type Digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
 type IdentifierStart = Lower | Upper | "_";
 type IdentifierCont = IdentifierStart | Digit;
 
-// ---------------------------------------------------------------------
-// Read an identifier
-// ---------------------------------------------------------------------
-
 type TakeIdentifier<
   S extends string,
   Acc extends string,
@@ -49,10 +41,6 @@ type TakeIdentifier<
     ? TakeIdentifier<Rest, `${Acc}${C}`>
     : [Acc, `${C}${Rest}`]
   : [Acc, ""];
-
-// ---------------------------------------------------------------------
-// Extract all identifiers from a string
-// ---------------------------------------------------------------------
 
 type Identifiers<
   S extends string,
@@ -68,10 +56,6 @@ type Identifiers<
     : Identifiers<Rest, Acc>
   : Acc;
 
-// ---------------------------------------------------------------------
-// Prolog variable test
-// ---------------------------------------------------------------------
-
 type IsPrologVariable<S extends string> = S extends `_${string}`
   ? true
   : S extends Capitalize<S>
@@ -80,25 +64,13 @@ type IsPrologVariable<S extends string> = S extends `_${string}`
       : true
     : false;
 
-// ---------------------------------------------------------------------
-// Ignore variables beginning with _
-// ---------------------------------------------------------------------
-
 type VisibleVariable<S extends string> = S extends `_${string}` ? never : S;
-
-// ---------------------------------------------------------------------
-// Extract visible variables from a query
-// ---------------------------------------------------------------------
 
 type QueryVariables<Q extends string> = {
   [K in Identifiers<Q>]: IsPrologVariable<K> extends true
     ? VisibleVariable<K>
     : never;
 }[Identifiers<Q>];
-
-// ---------------------------------------------------------------------
-// Utility: set equality
-// ---------------------------------------------------------------------
 
 type SameSet<A extends string, B extends string> = [Exclude<A, B>] extends [
   never,
@@ -108,25 +80,14 @@ type SameSet<A extends string, B extends string> = [Exclude<A, B>] extends [
     : false
   : false;
 
-// ---------------------------------------------------------------------
-// Closed query
-// ---------------------------------------------------------------------
-
 export type ClosedQuery<Q extends string> = [QueryVariables<Q>] extends [never]
   ? Q
   : never;
 
-// ---------------------------------------------------------------------
-// Open query
-// ---------------------------------------------------------------------
 export type OpenQuery<Vars extends Record<string, unknown>, Q extends string> =
   SameSet<QueryVariables<Q>, Extract<keyof Vars, string>> extends true
     ? Q
     : never;
-
-// ---------------------------------------------------------------------
-// Derived helper types
-// ---------------------------------------------------------------------
 
 export type HasVariables<Q extends string> = [QueryVariables<Q>] extends [never]
   ? false
@@ -135,5 +96,3 @@ export type HasVariables<Q extends string> = [QueryVariables<Q>] extends [never]
 type QueryBindings<Q extends string> = {
   [K in QueryVariables<Q>]: unknown;
 };
-
-type QueryResult<Q extends string> = QueryBindings<Q>[];
