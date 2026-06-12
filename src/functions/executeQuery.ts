@@ -4,6 +4,8 @@ import type {
   ClosedQuery,
   HasVariables,
   QueryBindings,
+  QueryVariables,
+  SameSet,
 } from "./queryVariables";
 
 export async function executeClosedQuery<Q extends string = string>(
@@ -15,21 +17,39 @@ export async function executeClosedQuery<Q extends string = string>(
   return result?.success === true;
 }
 
-export async function* executeOpenQuery<Q extends string>(
-  engine: swipl.SWIPLModule,
-  queryString: Q &
-    (HasVariables<Q> extends true
-      ? Q
-      : "❌ Type Error: Open queries must contain at least one uppercase variable."),
-): AsyncGenerator<{ bindings: QueryBindings<Q> }, void, unknown> {
-  const query = engine.prolog.query(queryString);
-  while (true) {
-    const answer = (await query.next()) as {
-      value: QueryBindings<Q>;
-      done: boolean;
-    } | null;
-    if (!answer || !("value" in answer)) return;
-    yield { bindings: answer.value as QueryBindings<Q> };
-    if (answer.done === true) return;
-  }
+export function executeOpenQuery<
+  T extends Record<string, any> = Record<string, unknown>,
+>(engine: any) {
+  return async function* <Q extends string>(
+    queryString: Q &
+      (Record<string, unknown> extends T
+        ? HasVariables<Q> extends true
+          ? Q
+          : "❌ Type Error: Open queries must contain at least one uppercase variable."
+        : SameSet<QueryVariables<Q>, Extract<keyof T, string>> extends true
+          ? Q
+          : `❌ Type Error: Variable mismatch. The query contains variables [${Extract<QueryVariables<Q>, string>}], but your interface expects: [${Extract<keyof T, string>}]`),
+  ): AsyncGenerator<
+    { bindings: Record<string, unknown> extends T ? QueryBindings<Q> : T },
+    void,
+    unknown
+  > {
+    const query = await engine.prolog.query(queryString);
+    try {
+      while (true) {
+        const answer = await query.next();
+        if (!answer || !("value" in answer)) return;
+
+        yield {
+          bindings: answer.value as Record<string, unknown> extends T
+            ? QueryBindings<Q>
+            : T,
+        };
+
+        if (answer.done === true) return;
+      }
+    } finally {
+      if (query) await query.close();
+    }
+  };
 }
