@@ -1,9 +1,16 @@
 <template>
   <div>
     <h3>Course Form</h3>
-    <input v-model="rawName" placeholder="Enter course name" />
+    <NameInput
+      v-model="rawName"
+      v-model:valid="isValidName"
+      placeholder="Course name"
+      @enter-pressed="commit"
+    />
     <SkillSelector :available-skills="skills" v-model="draftSkills" />
+
     <button :disabled="!canCommit" @click="commit">Add Course</button>
+
     <h4 v-if="courses.size > 0">Registered Courses</h4>
     <ul>
       <li v-for="[slug, properties] in courses" :key="slug">
@@ -20,6 +27,7 @@
 </template>
 
 <script setup lang="ts">
+import NameInput from "./NameInput.vue";
 import { computed, ref } from "vue";
 import SkillSelector from "./SkillSelector.vue";
 import type { HumanLabel, PrologSlug } from "../types/slugLabel";
@@ -35,6 +43,7 @@ defineProps<{
 }>();
 
 const rawName = ref<string>("");
+const isValidName = ref<boolean>(false);
 const draftSkills = ref<Set<PrologSlug>>(new Set());
 
 const emit = defineEmits<{
@@ -45,9 +54,7 @@ const emit = defineEmits<{
   (e: "removeCourse", slug: PrologSlug): void;
 }>();
 
-const canCommit = computed<boolean>(
-  () => rawName.value.trim().length > 0 && draftSkills.value.size > 0,
-);
+const canCommit = computed<boolean>(() => isValidName.value);
 
 const commit = () => {
   if (!canCommit.value) return;

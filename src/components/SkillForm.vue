@@ -1,9 +1,11 @@
 <template>
   <h3>Skill Form</h3>
-  <input
+
+  <NameInput
     v-model="rawInput"
-    placeholder="Enter a skill name"
-    @keyup.enter="commit"
+    v-model:valid="isValid"
+    placeholder="Skill name"
+    @enter-pressed="commit"
   />
   <button :disabled="!isValid" @click="commit">Add Skill</button>
 
@@ -16,7 +18,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref } from "vue";
+import NameInput from "./NameInput.vue";
 import { labelToSlug, slugToLabel } from "../functions/slugify";
 import type { HumanLabel, PrologSlug } from "../types/slugLabel";
 
@@ -30,7 +33,7 @@ const emit = defineEmits<{
 }>();
 
 const rawInput = ref("");
-const isValid = computed(() => rawInput.value.trim().length > 0);
+const isValid = ref(false);
 
 const commit = () => {
   if (!isValid.value) return;
@@ -42,3 +45,16 @@ const commit = () => {
   }
 };
 </script>
+
+<style lang="css">
+.skill-pill {
+  color: var(--vt-c-text-dark-2, #42b883);
+  background-color: #eee;
+  border-color: #666;
+  border-width: 2px;
+  border-style: solid;
+  border-radius: 7px;
+  margin: 5px;
+  padding: 5px;
+}
+</style>

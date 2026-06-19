@@ -67,7 +67,7 @@ const removeCourse = (slug: PrologSlug) => {
 
 const submit = () => {
   console.log("Skills:", Array.from(skills.value));
-  console.log("Teachers:", teachers.value);
-  console.log("Courses:", courses.value);
+  console.log("Teachers:", Array.from(teachers.value));
+  console.log("Courses:", Array.from(courses.value));
 };
 </script>

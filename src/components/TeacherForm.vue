@@ -1,7 +1,12 @@
 <template>
   <div>
     <h3>Teacher Form</h3>
-    <input v-model="rawName" placeholder="Enter teacher name" />
+    <NameInput
+      v-model="rawName"
+      v-model:valid="isValidName"
+      placeholder="Teacher name"
+      @enter-pressed="commit"
+    />
 
     <SkillSelector :available-skills="skills" v-model="draftSkills" />
 
@@ -25,6 +30,7 @@ import { ref, computed } from "vue";
 import { labelToSlug, slugToLabel } from "../functions/slugify";
 import type { HumanLabel, PrologSlug } from "../types/slugLabel";
 import SkillSelector from "./SkillSelector.vue";
+import NameInput from "./NameInput.vue";
 
 export interface TeacherProperties {
   skills: Set<PrologSlug>;
@@ -44,10 +50,11 @@ const emit = defineEmits<{
 }>();
 
 const rawName = ref("");
+const isValidName = ref(false);
 const draftSkills = ref<Set<PrologSlug>>(new Set());
 
 const canCommit = computed<boolean>(
-  () => rawName.value.trim().length > 0 && draftSkills.value.size > 0,
+  () => isValidName.value && draftSkills.value.size > 0,
 );
 
 const commit = () => {
