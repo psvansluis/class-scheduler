@@ -2,8 +2,12 @@
   <h2>Generated Schedule Grid</h2>
   <input v-model="typePrefix" placeholder="Enter a type prefix" />
   <input v-model="label" placeholder="Enter a label" />
-  <p>Generated Slug: {{ slug }}</p>
-  <p>Back to Label: {{ labelBack }}</p>
+  <p v-if="slug">Generated Slug: {{ slug }}</p>
+  <p v-if="labelBack">
+    Back to Label: "{{ labelBack.label }}"" with type prefix "{{
+      labelBack.typePrefix
+    }}"
+  </p>
 </template>
 
 <script setup lang="ts">
@@ -13,21 +17,17 @@ import type { HumanLabel, TypePrefix } from "../types/slugLabel";
 
 const typePrefix = ref<TypePrefix | undefined>(undefined);
 const label = ref<HumanLabel | undefined>(undefined);
-const slug = computed(() => {
-  console.log("Label value:", label.value);
-  return label.value && typePrefix.value
+const slug = computed(() =>
+  label.value && typePrefix.value
     ? labelToSlug(label.value, typePrefix.value)
-    : "no slug yet";
-});
+    : undefined,
+);
 
 const labelBack: ComputedRef<
   | {
       label: HumanLabel;
       typePrefix: TypePrefix;
     }
-  | "no label yet"
-> = computed(() => {
-  if (!slug.value || slug.value === "no slug yet") return "no label yet";
-  return slugToLabel(slug.value);
-});
+  | undefined
+> = computed(() => (slug.value ? slugToLabel(slug.value) : undefined));
 </script>
