@@ -6,7 +6,7 @@ import type {
   QueryBindings,
   QueryVariables,
   SameSet,
-} from "./queryVariables";
+} from "../types/queryVariables";
 
 export async function executeClosedQuery<Q extends string = string>(
   engine: swipl.SWIPLModule,
