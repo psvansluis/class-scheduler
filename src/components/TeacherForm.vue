@@ -14,12 +14,12 @@
 
     <h4>Registered Teachers</h4>
     <ul>
-      <li v-for="teacher in teachers" :key="teacher.slug">
-        <strong>{{ slugToLabel(teacher.slug).label }}</strong> can teach:
-        <span v-for="skillSlug in teacher.skills" :key="skillSlug">
+      <li v-for="[slug, properties] in teachers" :key="slug">
+        <strong>{{ slugToLabel(slug).label }}</strong> can teach:
+        <span v-for="skillSlug in properties.skills" :key="skillSlug">
           [{{ slugToLabel(skillSlug).label }}]
         </span>
-        <button @click="$emit('removeTeacher', teacher.slug)">❌</button>
+        <button @click="$emit('removeTeacher', slug)">❌</button>
       </li>
     </ul>
   </div>
@@ -30,20 +30,19 @@ import { ref, computed } from "vue";
 import { labelToSlug, slugToLabel } from "../functions/slugify";
 import type { HumanLabel, PrologSlug } from "../types/slugLabel";
 
-interface Teacher {
-  slug: PrologSlug;
+export interface TeacherProperties {
   skills: Set<PrologSlug>;
 }
 
 defineProps<{
   skills: Set<PrologSlug>;
-  teachers: Teacher[];
+  teachers: Map<PrologSlug, TeacherProperties>;
 }>();
 
 const emit = defineEmits<{
   (
     e: "addTeacher",
-    payload: { slug: PrologSlug; skills: Set<PrologSlug> },
+    payload: { slug: PrologSlug; properties: TeacherProperties },
   ): void;
   (e: "removeTeacher", slug: PrologSlug): void;
 }>();
@@ -60,7 +59,7 @@ const commit = () => {
   try {
     emit("addTeacher", {
       slug: labelToSlug(rawName.value as HumanLabel, "teacher"),
-      skills: new Set([selectedSkill.value as PrologSlug]),
+      properties: { skills: new Set([selectedSkill.value as PrologSlug]) },
     });
     rawName.value = "";
     selectedSkill.value = "";

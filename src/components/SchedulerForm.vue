@@ -19,16 +19,11 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import SkillForm from "./SkillForm.vue";
-import TeacherForm from "./TeacherForm.vue";
+import TeacherForm, { type TeacherProperties } from "./TeacherForm.vue";
 import type { PrologSlug } from "../types/slugLabel";
 
-interface Teacher {
-  slug: PrologSlug;
-  skills: Set<PrologSlug>;
-}
-
 const skills = ref<Set<PrologSlug>>(new Set());
-const teachers = ref<Teacher[]>([]);
+const teachers = ref<Map<PrologSlug, TeacherProperties>>(new Map());
 
 const addSkill = (slug: PrologSlug) => {
   skills.value.add(slug);
@@ -39,12 +34,15 @@ const removeSkill = (slug: PrologSlug) => {
   teachers.value.forEach((t) => t.skills.delete(slug));
 };
 
-const addTeacher = (payload: { slug: PrologSlug; skills: Set<PrologSlug> }) => {
-  teachers.value.push(payload);
+const addTeacher = (payload: {
+  slug: PrologSlug;
+  properties: TeacherProperties;
+}) => {
+  teachers.value.set(payload.slug, payload.properties);
 };
 
 const removeTeacher = (slug: PrologSlug) => {
-  teachers.value = teachers.value.filter((t) => t.slug !== slug);
+  teachers.value.delete(slug);
 };
 
 const submit = () => {
