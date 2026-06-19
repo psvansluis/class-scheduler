@@ -31,3 +31,4 @@ dist-ssr
 /playwright/.auth/
 
 prolog/*.js
+e2e/*.js
