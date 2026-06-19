@@ -1,52 +1,44 @@
-<script lang="ts" setup>
-import { computed, ref } from "vue";
-
-const newSkill = ref("");
-const skills = ref<Set<string>>(new Set());
-const canAddSkill = computed(() => newSkill.value.trim().length > 0);
-const addSkill = () => {
-  if (canAddSkill.value) {
-    skills.value.add(newSkill.value.trim());
-    newSkill.value = "";
-    emit("update:skills", skills.value);
-  }
-};
-const removeSkill = (skill: string) => {
-  skills.value.delete(skill);
-  emit("update:skills", skills.value);
-};
-const emit = defineEmits({
-  "update:skills": (skills: Set<string>): boolean => {
-    if (skills.size === 0) {
-      console.warn("No skills provided. Emitting empty set.");
-      return false;
-    }
-    return true;
-  },
-});
-</script>
-
 <template>
-  <h3>Skill form</h3>
-  <input v-model="newSkill" placeholder="Enter a skill name" />
-  <button :disabled="!canAddSkill" @click="addSkill">Add Skill</button>
-  <br />
-  <p v-for="skill in skills" :key="skill" class="skill-pill">
-    {{ skill }}
-    <button @click="removeSkill(skill)">❌</button>
-  </p>
+  <h3>Skill Form</h3>
+  <input
+    v-model="rawInput"
+    placeholder="Enter a skill name"
+    @keyup.enter="commit"
+  />
+  <button :disabled="!isValid" @click="commit">Add Skill</button>
+
+  <div>
+    <span v-for="slug in skills" :key="slug" class="skill-pill">
+      {{ slugToLabel(slug).label }}
+      <button @click="$emit('removeSkill', slug)">❌</button>
+    </span>
+  </div>
 </template>
 
-<style>
-.skill-pill {
-  display: inline-block;
-  padding: 4px 12px;
-  margin: 4px;
-  color: var(--vt-c-text-dark-2, #42b883);
-  border-color: #666;
-  border-width: 2px;
-  border-style: solid;
-  animation: flip-page 1.2s infinite ease-in-out;
-  border-radius: 4px;
-}
-</style>
+<script setup lang="ts">
+import { ref, computed } from "vue";
+import { labelToSlug, slugToLabel } from "../functions/slugify";
+import type { HumanLabel, PrologSlug } from "../types/slugLabel";
+
+defineProps<{
+  skills: Set<PrologSlug>;
+}>();
+
+const emit = defineEmits<{
+  (e: "addSkill", slug: PrologSlug): void;
+  (e: "removeSkill", slug: PrologSlug): void;
+}>();
+
+const rawInput = ref("");
+const isValid = computed(() => rawInput.value.trim().length > 0);
+
+const commit = () => {
+  if (!isValid.value) return;
+  try {
+    emit("addSkill", labelToSlug(rawInput.value as HumanLabel, "skill"));
+    rawInput.value = "";
+  } catch (err) {
+    console.error(err);
+  }
+};
+</script>
