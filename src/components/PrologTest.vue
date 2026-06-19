@@ -59,8 +59,10 @@ const runTest = async () => {
       "can_teach(Teacher, organic_chemistry_101).",
     ).next();
 
-    for await (const y of executeOpenQuery(swi)("plus(Y, X, 4).")) {
-      console.log("Query result for plus(Y, X, 4):", y.bindings); // Should log 4
+    for await (const y of executeOpenQuery<{ Y: number }>(swi)(
+      "plus(Y, 1, 4).",
+    )) {
+      console.log("Query result for plus(Y, 1, 4):", y.Y); // Should log 3
     }
 
     type TeacherSkill = { Skill: string };
@@ -71,7 +73,7 @@ const runTest = async () => {
 
     for await (const result of stream) {
       // Clear, elegant, and completely un-nested
-      console.log("Found skill row:", result.bindings.Skill);
+      console.log("Found skill row:", result.Skill);
     }
 
     result.value = canTeach
