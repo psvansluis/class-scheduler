@@ -3,16 +3,11 @@
     <h3>Teacher Form</h3>
     <input v-model="rawName" placeholder="Enter teacher name" />
 
-    <select v-model="selectedSkill">
-      <option value="" disabled>Select a skill</option>
-      <option v-for="slug in skills" :key="slug" :value="slug">
-        {{ slugToLabel(slug).label }}
-      </option>
-    </select>
+    <SkillSelector :available-skills="skills" v-model="draftSkills" />
 
     <button :disabled="!canCommit" @click="commit">Add Teacher</button>
 
-    <h4>Registered Teachers</h4>
+    <h4 v-if="teachers.size > 0">Registered Teachers</h4>
     <ul>
       <li v-for="[slug, properties] in teachers" :key="slug">
         <strong>{{ slugToLabel(slug).label }}</strong> can teach:
@@ -29,6 +24,7 @@
 import { ref, computed } from "vue";
 import { labelToSlug, slugToLabel } from "../functions/slugify";
 import type { HumanLabel, PrologSlug } from "../types/slugLabel";
+import SkillSelector from "./SkillSelector.vue";
 
 export interface TeacherProperties {
   skills: Set<PrologSlug>;
@@ -48,10 +44,10 @@ const emit = defineEmits<{
 }>();
 
 const rawName = ref("");
-const selectedSkill = ref<PrologSlug | "">("");
+const draftSkills = ref<Set<PrologSlug>>(new Set());
 
-const canCommit = computed(
-  () => rawName.value.trim().length > 0 && selectedSkill.value !== "",
+const canCommit = computed<boolean>(
+  () => rawName.value.trim().length > 0 && draftSkills.value.size > 0,
 );
 
 const commit = () => {
@@ -59,10 +55,10 @@ const commit = () => {
   try {
     emit("addTeacher", {
       slug: labelToSlug(rawName.value as HumanLabel, "teacher"),
-      properties: { skills: new Set([selectedSkill.value as PrologSlug]) },
+      properties: { skills: new Set(draftSkills.value) },
     });
     rawName.value = "";
-    selectedSkill.value = "";
+    draftSkills.value.clear();
   } catch (err) {
     console.error(err);
   }
