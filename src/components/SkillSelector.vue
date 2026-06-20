@@ -33,21 +33,23 @@ import { slugToLabel } from "../functions/slugify";
 import type { PrologSlug } from "../types/slugLabel";
 
 const props = defineProps<{
-  availableSkills: Set<PrologSlug>;
+  availableSkills: Set<PrologSlug<"skill">>;
 }>();
 
-const modelValue = defineModel<Set<PrologSlug>>({ default: () => new Set() });
+const modelValue = defineModel<Set<PrologSlug<"skill">>>({
+  default: () => new Set(),
+});
 
-const pendingSelection = ref<PrologSlug | "">("");
+const pendingSelection = ref<PrologSlug<"skill"> | null>(null);
 
 const addSelected = () => {
   if (pendingSelection.value) {
-    modelValue.value.add(pendingSelection.value as PrologSlug);
-    pendingSelection.value = "";
+    modelValue.value.add(pendingSelection.value as PrologSlug<"skill">);
+    pendingSelection.value = null;
   }
 };
 
-const removeSelected = (slug: PrologSlug) => {
+const removeSelected = (slug: PrologSlug<"skill">) => {
   modelValue.value.delete(slug);
 };
 </script>

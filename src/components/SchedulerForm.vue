@@ -28,46 +28,50 @@ import SkillForm from "./SkillForm.vue";
 import TeacherForm, { type TeacherProperties } from "./TeacherForm.vue";
 import type { PrologSlug } from "../types/slugLabel";
 import CourseForm, { type CourseProperties } from "./CourseForm.vue";
+import { processForm } from "../functions/processForm.ts";
 
-const skills = ref<Set<PrologSlug>>(new Set());
-const teachers = ref<Map<PrologSlug, TeacherProperties>>(new Map());
-const courses = ref<Map<PrologSlug, CourseProperties>>(new Map());
+const skills = ref<Set<PrologSlug<"skill">>>(new Set());
+const teachers = ref<Map<PrologSlug<"teacher">, TeacherProperties>>(new Map());
+const courses = ref<Map<PrologSlug<"course">, CourseProperties>>(new Map());
 
-const addSkill = (slug: PrologSlug) => {
+const addSkill = (slug: PrologSlug<"skill">) => {
   skills.value.add(slug);
 };
 
-const removeSkill = (slug: PrologSlug) => {
+const removeSkill = (slug: PrologSlug<"skill">) => {
   skills.value.delete(slug);
   teachers.value.forEach((t) => t.skills.delete(slug));
   courses.value.forEach((c) => c.skills.delete(slug));
 };
 
 const addTeacher = (payload: {
-  slug: PrologSlug;
+  slug: PrologSlug<"teacher">;
   properties: TeacherProperties;
 }) => {
   teachers.value.set(payload.slug, payload.properties);
 };
 
-const removeTeacher = (slug: PrologSlug) => {
+const removeTeacher = (slug: PrologSlug<"teacher">) => {
   teachers.value.delete(slug);
 };
 
 const addCourse = (payload: {
-  slug: PrologSlug;
+  slug: PrologSlug<"course">;
   properties: CourseProperties;
 }) => {
   courses.value.set(payload.slug, payload.properties);
 };
 
-const removeCourse = (slug: PrologSlug) => {
+const removeCourse = (slug: PrologSlug<"course">) => {
   courses.value.delete(slug);
 };
 
 const submit = () => {
-  console.log("Skills:", Array.from(skills.value));
-  console.log("Teachers:", Array.from(teachers.value));
-  console.log("Courses:", Array.from(courses.value));
+  const form = {
+    skills: skills.value,
+    teachers: teachers.value,
+    courses: courses.value,
+  };
+  processForm(form);
 };
 </script>

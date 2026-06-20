@@ -33,25 +33,27 @@ import SkillSelector from "./SkillSelector.vue";
 import type { HumanLabel, PrologSlug } from "../types/slugLabel";
 import { labelToSlug, slugToLabel } from "../functions/slugify";
 
+type CourseSlug = PrologSlug<"course">;
+
 export interface CourseProperties {
-  skills: Set<PrologSlug>;
+  skills: Set<PrologSlug<"skill">>;
 }
 
 defineProps<{
-  skills: Set<PrologSlug>;
-  courses: Map<PrologSlug, CourseProperties>;
+  skills: Set<PrologSlug<"skill">>;
+  courses: Map<CourseSlug, CourseProperties>;
 }>();
 
 const rawName = ref<string>("");
 const isValidName = ref<boolean>(false);
-const draftSkills = ref<Set<PrologSlug>>(new Set());
+const draftSkills = ref<Set<PrologSlug<"skill">>>(new Set());
 
 const emit = defineEmits<{
   (
     e: "addCourse",
-    payload: { slug: PrologSlug; properties: CourseProperties },
+    payload: { slug: CourseSlug; properties: CourseProperties },
   ): void;
-  (e: "removeCourse", slug: PrologSlug): void;
+  (e: "removeCourse", slug: CourseSlug): void;
 }>();
 
 const canCommit = computed<boolean>(() => isValidName.value);
@@ -60,7 +62,7 @@ const commit = () => {
   if (!canCommit.value) return;
   try {
     emit("addCourse", {
-      slug: labelToSlug(rawName.value as HumanLabel, "teacher"),
+      slug: labelToSlug(rawName.value as HumanLabel, "course"),
       properties: { skills: new Set(draftSkills.value) },
     });
     rawName.value = "";

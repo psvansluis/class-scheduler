@@ -24,12 +24,12 @@ import { labelToSlug, slugToLabel } from "../functions/slugify";
 import type { HumanLabel, PrologSlug } from "../types/slugLabel";
 
 defineProps<{
-  skills: Set<PrologSlug>;
+  skills: Set<PrologSlug<"skill">>;
 }>();
 
 const emit = defineEmits<{
-  (e: "addSkill", slug: PrologSlug): void;
-  (e: "removeSkill", slug: PrologSlug): void;
+  (e: "addSkill", slug: PrologSlug<"skill">): void;
+  (e: "removeSkill", slug: PrologSlug<"skill">): void;
 }>();
 
 const rawInput = ref("");

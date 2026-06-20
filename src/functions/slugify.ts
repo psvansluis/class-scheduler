@@ -1,20 +1,22 @@
 import type { HumanLabel, PrologSlug, TypePrefix } from "../types/slugLabel";
 import { Base64 } from "js-base64";
 
-export function labelToSlug(
+export function labelToSlug<T extends TypePrefix>(
   label: HumanLabel,
-  typePrefix: TypePrefix,
-): PrologSlug {
+  typePrefix: T,
+): PrologSlug<T> {
   const encoded = Base64.encode(label as string);
-  return `${typePrefix}__${encoded}` as PrologSlug;
+  return `${typePrefix}__${encoded}` as PrologSlug<T>;
 }
 
-export function slugToLabel(slug: PrologSlug): {
+export function slugToLabel<T extends TypePrefix>(
+  slug: PrologSlug<T>,
+): {
   label: HumanLabel;
-  typePrefix: TypePrefix;
+  typePrefix: T;
 } {
   const parts = (slug as string).split("__");
-  const typePrefix = parts[0] as TypePrefix;
+  const typePrefix = parts[0] as T;
   const encodedPayload = parts[1];
 
   if (!encodedPayload) {

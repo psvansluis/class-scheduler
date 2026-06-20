@@ -33,25 +33,25 @@ import SkillSelector from "./SkillSelector.vue";
 import NameInput from "./NameInput.vue";
 
 export interface TeacherProperties {
-  skills: Set<PrologSlug>;
+  skills: Set<PrologSlug<"skill">>;
 }
 
 defineProps<{
-  skills: Set<PrologSlug>;
-  teachers: Map<PrologSlug, TeacherProperties>;
+  skills: Set<PrologSlug<"skill">>;
+  teachers: Map<PrologSlug<"teacher">, TeacherProperties>;
 }>();
 
 const emit = defineEmits<{
   (
     e: "addTeacher",
-    payload: { slug: PrologSlug; properties: TeacherProperties },
+    payload: { slug: PrologSlug<"teacher">; properties: TeacherProperties },
   ): void;
-  (e: "removeTeacher", slug: PrologSlug): void;
+  (e: "removeTeacher", slug: PrologSlug<"teacher">): void;
 }>();
 
 const rawName = ref("");
 const isValidName = ref(false);
-const draftSkills = ref<Set<PrologSlug>>(new Set());
+const draftSkills = ref<Set<PrologSlug<"skill">>>(new Set());
 
 const canCommit = computed<boolean>(
   () => isValidName.value && draftSkills.value.size > 0,
