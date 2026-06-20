@@ -32,12 +32,9 @@ import { computed, ref } from "vue";
 import SkillSelector from "./SkillSelector.vue";
 import type { HumanLabel, PrologSlug } from "../types/slugLabel";
 import { labelToSlug, slugToLabel } from "../functions/slugify";
+import type { CourseProperties } from "../types/form";
 
 type CourseSlug = PrologSlug<"course">;
-
-export interface CourseProperties {
-  skills: Set<PrologSlug<"skill">>;
-}
 
 defineProps<{
   skills: Set<PrologSlug<"skill">>;

@@ -5,7 +5,7 @@ export function labelToSlug<T extends TypePrefix>(
   label: HumanLabel,
   typePrefix: T,
 ): PrologSlug<T> {
-  const encoded = Base64.encode(label as string);
+  const encoded = Base64.encode(label as string, true);
   return `${typePrefix}__${encoded}` as PrologSlug<T>;
 }
 

@@ -1,5 +1,5 @@
-import type { CourseProperties } from "../components/CourseForm.vue";
-import type { TeacherProperties } from "../components/TeacherForm.vue";
+import type { CourseProperties } from "../types/form.d.ts";
+import type { TeacherProperties } from "../types/form.d.ts";
 import type { PrologSlug } from "../types/slugLabel";
 
 import { executeOpenQuery, executeClosedQuery } from "./executeQuery";

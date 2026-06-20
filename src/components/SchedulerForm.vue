@@ -23,16 +23,36 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import SkillForm from "./SkillForm.vue";
-import TeacherForm, { type TeacherProperties } from "./TeacherForm.vue";
+import TeacherForm from "./TeacherForm.vue";
 import type { PrologSlug } from "../types/slugLabel";
-import CourseForm, { type CourseProperties } from "./CourseForm.vue";
+import CourseForm from "./CourseForm.vue";
 import { processForm } from "../functions/processForm.ts";
+import type { CourseProperties, TeacherProperties } from "../types/form";
+import { useRoute, useRouter } from "vue-router";
+import { decodeForm, encodeForm } from "../functions/formCodec.ts";
+
+const route = useRoute();
+const router = useRouter();
 
 const skills = ref<Set<PrologSlug<"skill">>>(new Set());
 const teachers = ref<Map<PrologSlug<"teacher">, TeacherProperties>>(new Map());
 const courses = ref<Map<PrologSlug<"course">, CourseProperties>>(new Map());
+
+onMounted(() => {
+  const stateQuery = route.query.state;
+  if (typeof stateQuery === "string" && stateQuery.length > 0) {
+    try {
+      const hydrated = decodeForm(stateQuery);
+      skills.value = hydrated.skills;
+      teachers.value = hydrated.teachers;
+      courses.value = hydrated.courses;
+    } catch (e) {
+      console.error("Failed to parse form state from URL payload", e);
+    }
+  }
+});
 
 const addSkill = (slug: PrologSlug<"skill">) => {
   skills.value.add(slug);
@@ -72,6 +92,7 @@ const submit = () => {
     teachers: teachers.value,
     courses: courses.value,
   };
-  processForm(form);
+  const encodedState = encodeForm(form);
+  router.push({ name: "result", query: { state: encodedState } });
 };
 </script>
