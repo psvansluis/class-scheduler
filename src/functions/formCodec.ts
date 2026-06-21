@@ -1,6 +1,6 @@
 import { Base64 } from "js-base64";
 
-import type { Form } from "./processForm.ts";
+import type { Form } from "../types/form";
 import type { Serializable } from "../types/serializable";
 import type { PrologSlug } from "../types/slugLabel";
 

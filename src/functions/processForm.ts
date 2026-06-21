@@ -1,16 +1,9 @@
-import type { CourseProperties } from "../types/form.d.ts";
-import type { TeacherProperties } from "../types/form.d.ts";
+import type { Form } from "../types/form.d.ts";
 import type { PrologSlug } from "../types/slugLabel";
 
 import { executeOpenQuery, executeClosedQuery } from "./executeQuery";
 import swipl from "swipl-wasm";
 import { slugToLabel } from "./slugify.ts";
-
-export type Form = {
-  skills: Set<PrologSlug<"skill">>;
-  teachers: Map<PrologSlug<"teacher">, TeacherProperties>;
-  courses: Map<PrologSlug<"course">, CourseProperties>;
-};
 
 export const processForm = async (form: Form): Promise<void> => {
   const rules = await getRules();

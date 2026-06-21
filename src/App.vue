@@ -3,8 +3,9 @@
     <header>
       <h1>Declarative Class Scheduler</h1>
       <nav>
-        <router-link to="/">Setup Constraints</router-link> |
-        <router-link to="/result">View Schedule</router-link>
+        <AppLink name="form"> Setup Constraints </AppLink>
+        |
+        <AppLink name="result">View Schedule</AppLink>
       </nav>
     </header>
     <main>

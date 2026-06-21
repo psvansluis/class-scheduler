@@ -19,7 +19,9 @@
       @remove-course="removeCourse"
     ></CourseForm>
   </div>
-  <button @click="submit">Submit</button>
+  <button @click="clear">Clear</button>
+  <button @click="save">Save</button>
+  <button @click="submit">View Schedule</button>
 </template>
 
 <script setup lang="ts">
@@ -28,10 +30,9 @@ import SkillForm from "./SkillForm.vue";
 import TeacherForm from "./TeacherForm.vue";
 import type { PrologSlug } from "../types/slugLabel";
 import CourseForm from "./CourseForm.vue";
-import { processForm } from "../functions/processForm.ts";
-import type { CourseProperties, TeacherProperties } from "../types/form";
+import type { CourseProperties, Form, TeacherProperties } from "../types/form";
 import { useRoute, useRouter } from "vue-router";
-import { decodeForm, encodeForm } from "../functions/formCodec.ts";
+import { formToStateQuery, stateQueryToForm } from "../functions/stateQuery.ts";
 
 const route = useRoute();
 const router = useRouter();
@@ -41,22 +42,15 @@ const teachers = ref<Map<PrologSlug<"teacher">, TeacherProperties>>(new Map());
 const courses = ref<Map<PrologSlug<"course">, CourseProperties>>(new Map());
 
 onMounted(() => {
-  const stateQuery = route.query.state;
-  if (typeof stateQuery === "string" && stateQuery.length > 0) {
-    try {
-      const hydrated = decodeForm(stateQuery);
-      skills.value = hydrated.skills;
-      teachers.value = hydrated.teachers;
-      courses.value = hydrated.courses;
-    } catch (e) {
-      console.error("Failed to parse form state from URL payload", e);
-    }
+  const form = stateQueryToForm(route);
+  if (form) {
+    skills.value = form.skills;
+    teachers.value = form.teachers;
+    courses.value = form.courses;
   }
 });
 
-const addSkill = (slug: PrologSlug<"skill">) => {
-  skills.value.add(slug);
-};
+const addSkill = (slug: PrologSlug<"skill">) => skills.value.add(slug);
 
 const removeSkill = (slug: PrologSlug<"skill">) => {
   skills.value.delete(slug);
@@ -67,32 +61,36 @@ const removeSkill = (slug: PrologSlug<"skill">) => {
 const addTeacher = (payload: {
   slug: PrologSlug<"teacher">;
   properties: TeacherProperties;
-}) => {
-  teachers.value.set(payload.slug, payload.properties);
-};
+}) => teachers.value.set(payload.slug, payload.properties);
 
-const removeTeacher = (slug: PrologSlug<"teacher">) => {
+const removeTeacher = (slug: PrologSlug<"teacher">) =>
   teachers.value.delete(slug);
-};
 
 const addCourse = (payload: {
   slug: PrologSlug<"course">;
   properties: CourseProperties;
-}) => {
-  courses.value.set(payload.slug, payload.properties);
+}) => courses.value.set(payload.slug, payload.properties);
+
+const removeCourse = (slug: PrologSlug<"course">) => courses.value.delete(slug);
+
+const form = (): Form => ({
+  skills: skills.value,
+  teachers: teachers.value,
+  courses: courses.value,
+});
+
+const resetForm = (): void => {
+  skills.value = new Set();
+  teachers.value = new Map();
+  courses.value = new Map();
 };
 
-const removeCourse = (slug: PrologSlug<"course">) => {
-  courses.value.delete(slug);
+const clear = () => {
+  resetForm();
+  save();
 };
 
-const submit = () => {
-  const form = {
-    skills: skills.value,
-    teachers: teachers.value,
-    courses: courses.value,
-  };
-  const encodedState = encodeForm(form);
-  router.push({ name: "result", query: { state: encodedState } });
-};
+const save = () => formToStateQuery(form(), router);
+
+const submit = () => formToStateQuery(form(), router, "result");
 </script>
