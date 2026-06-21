@@ -1,7 +1,8 @@
 <template>
-  <div>
+  <div id="teacher-form">
     <h3>Teacher Form</h3>
     <NameInput
+      id="teacher-name-input"
       v-model="rawName"
       v-model:valid="isValidName"
       placeholder="Teacher name"
@@ -10,7 +11,9 @@
 
     <SkillSelector :available-skills="skills" v-model="draftSkills" />
 
-    <button :disabled="!canCommit" @click="commit">Add Teacher</button>
+    <button id="add-teacher-button" :disabled="!canCommit" @click="commit">
+      Add Teacher
+    </button>
 
     <h4 v-if="teachers.size > 0">Registered Teachers</h4>
     <ul>

@@ -13,7 +13,12 @@
           {{ slugToLabel(slug).label }}
         </option>
       </select>
-      <button type="button" :disabled="!pendingSelection" @click="addSelected">
+      <button
+        id="assign-skill-button"
+        type="button"
+        :disabled="!pendingSelection"
+        @click="addSelected"
+      >
         Assign
       </button>
     </div>

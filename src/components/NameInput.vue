@@ -1,13 +1,12 @@
 <template>
-  <div class="input-wrapper">
-    <input
-      v-model="modelValue"
-      :placeholder="placeholder"
-      :class="{ 'input-error': !isValid && modelValue.length > 0 }"
-      @input="reportValidity"
-      @keyup.enter="$emit('enterPressed')"
-    />
-  </div>
+  <input
+    v-bind="$attrs"
+    v-model="modelValue"
+    :placeholder="placeholder"
+    :class="{ 'input-error': !isValid && modelValue.length > 0 }"
+    @input="reportValidity"
+    @keyup.enter="$emit('enterPressed')"
+  />
 </template>
 
 <script setup lang="ts">

@@ -1,15 +1,18 @@
 <template>
-  <h3>Skill Form</h3>
+  <div id="skill-form">
+    <h3>Skill Form</h3>
 
-  <NameInput
-    v-model="rawInput"
-    v-model:valid="isValid"
-    placeholder="Skill name"
-    @enter-pressed="commit"
-  />
-  <button :disabled="!isValid" @click="commit">Add Skill</button>
+    <NameInput
+      id="skill-name-input"
+      v-model="rawInput"
+      v-model:valid="isValid"
+      placeholder="Skill name"
+      @enter-pressed="commit"
+    />
+    <button id="add-skill-button" :disabled="!isValid" @click="commit">
+      Add Skill
+    </button>
 
-  <div>
     <span v-for="slug in skills" :key="slug" class="skill-pill">
       {{ slugToLabel(slug).label }}
       <button @click="$emit('removeSkill', slug)">❌</button>
@@ -47,6 +50,9 @@ const commit = () => {
 </script>
 
 <style lang="css">
+#skill-name-input {
+  border-width: 2px;
+}
 .skill-pill {
   color: var(--vt-c-text-dark-2, #42b883);
   background-color: #eee;
