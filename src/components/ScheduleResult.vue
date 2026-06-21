@@ -6,7 +6,7 @@
   />
   <div v-else-if="error" class="error">{{ error }}</div>
   <div v-else>
-    <p v-for="fact in facts" :key="fact">
+    <p class="can-teach-result" v-for="fact in facts" :key="fact">
       {{ fact }}
     </p>
     <AppLink name="form">← Edit current form parameters</AppLink>

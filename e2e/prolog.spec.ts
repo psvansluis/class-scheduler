@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("Prolog Integration Engine", () => {
-  test("should load the website and successfully execute a SWI-Prolog query", async ({
+  test("should load the website, fill out a form and successfully execute a SWI-Prolog query", async ({
     page,
   }) => {
     await page.goto("./");
@@ -49,14 +49,46 @@ test.describe("Prolog Integration Engine", () => {
     await expect(addedTeacherListItem).toContainText("Mr. Jansen");
     await expect(addedTeacherListItem).toContainText("chemistry");
 
-    // const queryButton = page.locator('button:has-text("Load & Run Solver")');
-    // await expect(queryButton).toBeVisible();
-    // await queryButton.click();
+    // add course
+    const courseInput = page.locator("div#course-form input#course-name-input");
+    await expect(courseInput).toBeVisible();
+    await courseInput.fill("Organic Chemistry 101");
 
-    // const resultBox = page.locator(".result-box");
-    // await expect(resultBox).toBeVisible({ timeout: 5000 });
-    // await expect(resultBox).toContainText(
-    //   "Success! Mr. Jansen can teach the class.",
-    // );
+    const courseSkillInput = page.locator(
+      "div#course-form select#skill-dropdown",
+    );
+    await expect(courseSkillInput).toBeVisible();
+    await courseSkillInput.selectOption({ label: "chemistry" });
+
+    const assignCourseSkillButton = page.locator(
+      "div#course-form button#assign-skill-button",
+    );
+    await expect(assignCourseSkillButton).toBeVisible();
+    await assignCourseSkillButton.click();
+
+    const addCourseButton = page.locator(
+      "div#course-form button#add-course-button",
+    );
+    await expect(addCourseButton).toBeVisible();
+    await addCourseButton.click();
+
+    const addedCourseListItem = page.locator("div#course-form ul li");
+    await expect(addedCourseListItem).toBeVisible();
+    await expect(addedCourseListItem).toContainText("Organic Chemistry 101");
+    await expect(addedCourseListItem).toContainText("chemistry");
+
+    const submitButton = page.locator('button:has-text("View Schedule")');
+    await expect(submitButton).toBeVisible();
+    await submitButton.click();
+
+    const scheduleHeader = page.locator(
+      'h2:has-text("Generated Schedule Grid")',
+    );
+    await expect(scheduleHeader).toBeVisible();
+
+    const canTeachResult = page.locator("p.can-teach-result");
+    await expect(canTeachResult).toBeVisible({ timeout: 5000 });
+    await expect(canTeachResult).toContainText("Organic Chemistry 101");
+    await expect(canTeachResult).toContainText("Mr. Jansen");
   });
 });
