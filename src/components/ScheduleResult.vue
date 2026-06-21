@@ -6,9 +6,8 @@
   />
   <div v-else-if="error" class="error">{{ error }}</div>
   <div v-else>
-    <p>
-      Consultation successful. Check browser console logs for computed fact
-      bindings!
+    <p v-for="fact in facts" :key="fact">
+      {{ fact }}
     </p>
     <AppLink name="form">← Edit current form parameters</AppLink>
   </div>
@@ -24,6 +23,7 @@ import { stateQueryToForm } from "../functions/stateQuery.ts";
 const route = useRoute();
 const loading = ref(true);
 const error = ref<string | null>(null);
+const facts = ref<string[]>([]);
 
 onMounted(async () => {
   const form = stateQueryToForm(route);
@@ -34,7 +34,7 @@ onMounted(async () => {
     return;
   }
   try {
-    await processForm(form);
+    await processForm(form, facts.value);
   } catch (err: any) {
     console.error(err);
     error.value = `Failed to process layout calculations: ${err.message || err}`;

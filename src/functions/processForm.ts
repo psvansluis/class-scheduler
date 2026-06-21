@@ -5,7 +5,10 @@ import { executeOpenQuery, executeClosedQuery } from "./executeQuery";
 import swipl from "swipl-wasm";
 import { slugToLabel } from "./slugify.ts";
 
-export const processForm = async (form: Form): Promise<void> => {
+export const processForm = async (
+  form: Form,
+  factReceiver: string[],
+): Promise<void> => {
   const rules = await getRules();
   const facts = mapFormToFacts(form);
 
@@ -20,9 +23,7 @@ export const processForm = async (form: Form): Promise<void> => {
     Teacher: PrologSlug<"teacher">;
     Course: PrologSlug<"course">;
   }>(swi)("can_teach(Teacher, Course).")) {
-    console.log(Teacher);
-    console.log(Course);
-    console.log(
+    factReceiver.push(
       `Teacher ${slugToLabel(Teacher).label} can teach ${slugToLabel(Course).label}`,
     );
   }
@@ -39,12 +40,12 @@ const mapFormToFacts = (form: Form): string => {
   // const skillFacts = Array.from(form.skills).map((skill) => `skill(${skill}).`);
   const teacherFacts = Array.from(form.teachers).flatMap(([slug, props]) =>
     Array.from(props.skills).map(
-      (prop) => `teacher_skill('${slug}', '${prop}').`,
+      (skill) => `teacher_skill('${slug}', '${skill}').`,
     ),
   );
   const courseFacts = Array.from(form.courses).flatMap(([slug, props]) =>
     Array.from(props.skills).map(
-      (prop) => `course_requires('${slug}', '${prop}').`,
+      (skill) => `course_requires('${slug}', '${skill}').`,
     ),
   );
   return [...teacherFacts, ...courseFacts].join("\n");
