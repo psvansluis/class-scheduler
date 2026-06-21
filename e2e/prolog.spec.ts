@@ -6,89 +6,59 @@ test.describe("Prolog Integration Engine", () => {
   }) => {
     await page.goto("./");
 
+    // Explicitly assert page identity
     await expect(page.locator("h1")).toHaveText("Declarative Class Scheduler");
 
-    // add skill
-    const skillInput = page.locator("#skill-name-input");
-    await expect(skillInput).toBeVisible();
-    await skillInput.fill("chemistry");
+    // --- 1. Add Skill ---
+    await page.locator("#skill-name-input").fill("chemistry");
+    await page.locator("#add-skill-button").click();
 
-    const addSkillButton = page.locator("#add-skill-button");
-    await expect(addSkillButton).toBeVisible();
-    await addSkillButton.click();
+    // Assert skill collection rendering
+    await expect(page.locator(".skill-pill")).toContainText("chemistry");
 
-    const skillPill = page.locator(".skill-pill");
-    await expect(skillPill).toContainText("chemistry");
+    // --- 2. Add Teacher ---
+    const teacherForm = page.locator("#teacher-form");
+    await teacherForm.locator("#teacher-name-input").fill("Mr. Jansen");
+    await teacherForm
+      .locator("#skill-dropdown")
+      .selectOption({ label: "chemistry" });
+    await teacherForm.locator("#assign-skill-button").click();
+    await teacherForm.locator("#add-teacher-button").click();
 
-    // add teacher
-    const teacherInput = page.locator(
-      "div#teacher-form input#teacher-name-input",
-    );
-    await expect(teacherInput).toBeVisible();
-    await teacherInput.fill("Mr. Jansen");
+    // Verify list insertion inside scope
+    const teacherRow = teacherForm.locator("ul li");
+    for await (const text of ["Mr. Jansen", "chemistry"]) {
+      expect(teacherRow).toContainText(text);
+    }
 
-    const teacherDropdownSelector = "div#teacher-form select#skill-dropdown";
-    const teacherSkillInput = page.locator(teacherDropdownSelector);
-    await expect(teacherSkillInput).toBeVisible();
-    await teacherSkillInput.selectOption({ label: "chemistry" });
+    // --- 3. Add Course ---
+    const courseForm = page.locator("#course-form");
+    await courseForm
+      .locator("#course-name-input")
+      .fill("Organic Chemistry 101");
+    await courseForm
+      .locator("#skill-dropdown")
+      .selectOption({ label: "chemistry" });
+    await courseForm.locator("#assign-skill-button").click();
+    await courseForm.locator("#add-course-button").click();
 
-    const assignTeacherSkillButton = page.locator(
-      "div#teacher-form button#assign-skill-button",
-    );
-    await expect(assignTeacherSkillButton).toBeVisible();
-    await assignTeacherSkillButton.click();
+    const courseRow = courseForm.locator("ul li");
 
-    const addTeacherButton = page.locator(
-      "div#teacher-form button#add-teacher-button",
-    );
-    await expect(addTeacherButton).toBeVisible();
-    await addTeacherButton.click();
+    for await (const text of ["Organic Chemistry 101", "chemistry"]) {
+      await expect(courseRow).toContainText(text);
+    }
 
-    const addedTeacherListItem = page.locator("div#teacher-form ul li");
-    await expect(addedTeacherListItem).toBeVisible();
-    await expect(addedTeacherListItem).toContainText("Mr. Jansen");
-    await expect(addedTeacherListItem).toContainText("chemistry");
+    // --- 4. Submit and Process Prolog Solution ---
+    await page.getByRole("button", { name: "View Schedule" }).click();
 
-    // add course
-    const courseInput = page.locator("div#course-form input#course-name-input");
-    await expect(courseInput).toBeVisible();
-    await courseInput.fill("Organic Chemistry 101");
+    // Verify route hydration and UI resolution
+    await expect(
+      page.getByRole("heading", { name: "Generated Schedule Grid" }),
+    ).toBeVisible();
 
-    const courseSkillInput = page.locator(
-      "div#course-form select#skill-dropdown",
-    );
-    await expect(courseSkillInput).toBeVisible();
-    await courseSkillInput.selectOption({ label: "chemistry" });
-
-    const assignCourseSkillButton = page.locator(
-      "div#course-form button#assign-skill-button",
-    );
-    await expect(assignCourseSkillButton).toBeVisible();
-    await assignCourseSkillButton.click();
-
-    const addCourseButton = page.locator(
-      "div#course-form button#add-course-button",
-    );
-    await expect(addCourseButton).toBeVisible();
-    await addCourseButton.click();
-
-    const addedCourseListItem = page.locator("div#course-form ul li");
-    await expect(addedCourseListItem).toBeVisible();
-    await expect(addedCourseListItem).toContainText("Organic Chemistry 101");
-    await expect(addedCourseListItem).toContainText("chemistry");
-
-    const submitButton = page.locator('button:has-text("View Schedule")');
-    await expect(submitButton).toBeVisible();
-    await submitButton.click();
-
-    const scheduleHeader = page.locator(
-      'h2:has-text("Generated Schedule Grid")',
-    );
-    await expect(scheduleHeader).toBeVisible();
-
-    const canTeachResult = page.locator("p.can-teach-result");
-    await expect(canTeachResult).toBeVisible({ timeout: 5000 });
-    await expect(canTeachResult).toContainText("Organic Chemistry 101");
-    await expect(canTeachResult).toContainText("Mr. Jansen");
+    const result = page.locator("p.can-teach-result");
+    for await (const text of ["Organic Chemistry 101", "Mr. Jansen"]) {
+      await expect(result).toContainText(text, { timeout: 7000 });
+    }
   });
 });
