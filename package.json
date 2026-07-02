@@ -12,6 +12,7 @@
     "test": "npm run test:prolog && npm run test:playwright"
   },
   "dependencies": {
+    "@material-design-icons/font": "^0.14.15",
     "js-base64": "^3.7.8",
     "lz-string": "^1.5.0",
     "swipl-wasm": "^7.0.10",

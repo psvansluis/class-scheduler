@@ -13,17 +13,23 @@
       Add Skill
     </button>
 
-    <span v-for="slug in skills" :key="slug" class="skill-pill">
-      {{ slugToLabel(slug).label }}
-      <button @click="$emit('removeSkill', slug)">❌</button>
-    </span>
+    <div class="skill-pill-container" v-if="skills.size > 0">
+      <SkillPill
+        v-for="slug in skills"
+        :key="slug"
+        :slug="slug"
+        removable
+        @remove-skill="$emit('removeSkill', slug)"
+      />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue";
 import NameInput from "./NameInput.vue";
-import { labelToSlug, slugToLabel } from "../functions/slugify";
+import SkillPill from "./SkillPill.vue";
+import { labelToSlug } from "../functions/slugify";
 import type { HumanLabel, PrologSlug } from "../types/slugLabel";
 
 defineProps<{
@@ -53,14 +59,10 @@ const commit = () => {
 #skill-name-input {
   border-width: 2px;
 }
-.skill-pill {
-  color: var(--vt-c-text-dark-2, #42b883);
-  background-color: #eee;
-  border-color: #666;
-  border-width: 2px;
-  border-style: solid;
-  border-radius: 7px;
-  margin: 5px;
-  padding: 5px;
+.skill-pill-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  justify-content: space-between;
 }
 </style>
