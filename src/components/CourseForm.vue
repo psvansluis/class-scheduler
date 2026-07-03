@@ -7,6 +7,7 @@
       v-model:valid="isValidName"
       placeholder="Course name"
       @enter-pressed="commit"
+      @button-pressed="commit"
     />
     <SkillSelector :available-skills="skills" v-model="draftSkills" />
 

@@ -10,15 +10,16 @@ test.describe("Prolog Integration Engine", () => {
     await expect(page.locator("h1")).toHaveText("Declarative Class Scheduler");
 
     // --- 1. Add Skill ---
-    await page.locator("#skill-name-input").fill("chemistry");
-    await page.locator("#add-skill-button").click();
+    const skillForm = page.locator("#skill-form");
+    await skillForm.locator("#skill-name-input input").fill("chemistry");
+    await skillForm.locator("button").click();
 
     // Assert skill collection rendering
-    await expect(page.locator(".skill-pill")).toContainText("chemistry");
+    await expect(skillForm.locator(".skill-pill")).toContainText("chemistry");
 
     // --- 2. Add Teacher ---
     const teacherForm = page.locator("#teacher-form");
-    await teacherForm.locator("#teacher-name-input").fill("Mr. Jansen");
+    await teacherForm.locator("#teacher-name-input input").fill("Mr. Jansen");
     await teacherForm
       .locator("#skill-dropdown")
       .selectOption({ label: "chemistry" });
@@ -34,7 +35,7 @@ test.describe("Prolog Integration Engine", () => {
     // --- 3. Add Course ---
     const courseForm = page.locator("#course-form");
     await courseForm
-      .locator("#course-name-input")
+      .locator("#course-name-input input")
       .fill("Organic Chemistry 101");
     await courseForm
       .locator("#skill-dropdown")

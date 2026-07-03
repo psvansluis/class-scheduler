@@ -7,6 +7,7 @@
       v-model:valid="isValidName"
       placeholder="Teacher name"
       @enter-pressed="commit"
+      @button-pressed="commit"
     />
 
     <SkillSelector :available-skills="skills" v-model="draftSkills" />
@@ -19,9 +20,11 @@
     <ul>
       <li v-for="[slug, properties] in teachers" :key="slug">
         <strong>{{ slugToLabel(slug).label }}</strong> can teach:
-        <span v-for="skillSlug in properties.skills" :key="skillSlug">
-          [{{ slugToLabel(skillSlug).label }}]
-        </span>
+        <SkillPill
+          v-for="skillSlug in properties.skills"
+          :key="skillSlug"
+          :slug="skillSlug"
+        />
         <button @click="$emit('removeTeacher', slug)">❌</button>
       </li>
     </ul>
@@ -35,6 +38,7 @@ import type { HumanLabel, PrologSlug } from "../types/slugLabel";
 import SkillSelector from "./SkillSelector.vue";
 import NameInput from "./NameInput.vue";
 import type { TeacherProperties } from "../types/form";
+import SkillPill from "./SkillPill.vue";
 
 defineProps<{
   skills: Set<PrologSlug<"skill">>;
@@ -53,9 +57,7 @@ const rawName = ref("");
 const isValidName = ref(false);
 const draftSkills = ref<Set<PrologSlug<"skill">>>(new Set());
 
-const canCommit = computed<boolean>(
-  () => isValidName.value && draftSkills.value.size > 0,
-);
+const canCommit = computed<boolean>(() => isValidName.value);
 
 const commit = () => {
   if (!canCommit.value) return;

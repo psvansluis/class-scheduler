@@ -2,17 +2,16 @@
   <div id="skill-form">
     <h3>Skill Form</h3>
 
-    <NameInput
-      id="skill-name-input"
-      v-model="rawInput"
-      v-model:valid="isValid"
-      placeholder="Skill name"
-      @enter-pressed="commit"
-    />
-    <button id="add-skill-button" :disabled="!isValid" @click="commit">
-      Add Skill
-    </button>
-
+    <span class="add-skill-pill">
+      <NameInput
+        id="skill-name-input"
+        v-model="rawInput"
+        v-model:valid="isValid"
+        placeholder="Skill name"
+        @enter-pressed="commit"
+        @button-pressed="commit"
+      />
+    </span>
     <div class="skill-pill-container" v-if="skills.size > 0">
       <SkillPill
         v-for="slug in skills"
@@ -55,14 +54,10 @@ const commit = () => {
 };
 </script>
 
-<style lang="css">
-#skill-name-input {
-  border-width: 2px;
-}
+<style scoped lang="css">
 .skill-pill-container {
   display: flex;
   flex-wrap: wrap;
   gap: 5px;
-  justify-content: space-between;
 }
 </style>

@@ -1,8 +1,8 @@
 <template>
   <div class="skill-pill" :style="{ backgroundColor: colour }">
-    {{ label }}
+    <span class="pill-label">{{ label }}</span>
     <button
-      class="material-icons-outlined"
+      class="material-icons-outlined delete-btn"
       v-if="removable"
       @click="$emit('removeSkill')"
     >
@@ -40,30 +40,52 @@ const colour = computed(() => `hsl(${hue()}, ${sat()}%, 70%)`);
 
 <style scoped>
 .skill-pill {
+  position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
   color: black;
   border: 2px solid rgb(102, 102, 102);
   border-radius: 7px;
   margin: 5px;
-  padding: 5px;
+  padding: 6px 10px;
+  box-sizing: border-box;
+  transition: padding 0.2s ease;
 }
 
-.skill-pill button {
-  color: rgba(102, 102, 102, 0.8);
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  transition: all 0.5s ease-in;
-  font-size: 1.2em;
+.pill-label {
+  font-weight: 500;
+  white-space: nowrap;
 }
 
-.skill-pill button:hover {
-  color: rgba(102, 102, 102, 1);
-  transform: scale(1.2);
-  background-color: rgba(255, 255, 255, 0.8);
+.skill-pill .delete-btn {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  font-size: 0.95rem;
+  color: rgb(102, 102, 102);
+  background-color: #ffffff7e;
+  border: 1.5px solid rgb(102, 102, 102);
   border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transform: scale(0.6);
+  transition:
+    transform 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.skill-pill:hover .delete-btn {
+  background-color: #ffffff;
+  transform: scale(1);
+}
+
+.skill-pill .delete-btn:hover {
+  background-color: #ffdddd;
+  color: #cc0000;
+  border-color: #cc0000;
 }
 </style>

@@ -1,24 +1,21 @@
 <template>
-  <div>
-    <h2>Setup Forms</h2>
-    <SkillForm
-      :skills="skills"
-      @add-skill="addSkill"
-      @remove-skill="removeSkill"
-    />
-    <TeacherForm
-      :skills="skills"
-      :teachers="teachers"
-      @add-teacher="addTeacher"
-      @remove-teacher="removeTeacher"
-    />
-    <CourseForm
-      :skills="skills"
-      :courses="courses"
-      @add-course="addCourse"
-      @remove-course="removeCourse"
-    ></CourseForm>
-  </div>
+  <SkillForm
+    :skills="skills"
+    @add-skill="addSkill"
+    @remove-skill="removeSkill"
+  />
+  <TeacherForm
+    :skills="skills"
+    :teachers="teachers"
+    @add-teacher="addTeacher"
+    @remove-teacher="removeTeacher"
+  />
+  <CourseForm
+    :skills="skills"
+    :courses="courses"
+    @add-course="addCourse"
+    @remove-course="removeCourse"
+  ></CourseForm>
   <button @click="clear">Clear</button>
   <button @click="save">Save</button>
   <button @click="submit">View Schedule</button>
