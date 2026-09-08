@@ -23,13 +23,12 @@ test.describe("Prolog Integration Engine", () => {
     await teacherForm
       .locator("#skill-dropdown")
       .selectOption({ label: "chemistry" });
-    await teacherForm.locator("#assign-skill-button").click();
     await teacherForm.locator("#add-teacher-button").click();
 
     // Verify list insertion inside scope
     const teacherRow = teacherForm.locator("ul li");
     for await (const text of ["Mr. Jansen", "chemistry"]) {
-      expect(teacherRow).toContainText(text);
+      await expect(teacherRow).toContainText(text);
     }
 
     // --- 3. Add Course ---
@@ -40,7 +39,6 @@ test.describe("Prolog Integration Engine", () => {
     await courseForm
       .locator("#skill-dropdown")
       .selectOption({ label: "chemistry" });
-    await courseForm.locator("#assign-skill-button").click();
     await courseForm.locator("#add-course-button").click();
 
     const courseRow = courseForm.locator("ul li");

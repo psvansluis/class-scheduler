@@ -101,3 +101,77 @@ h2 {
 * {
   font-family: var(--serif);
 }
+.app-input-field {
+  width: 100%;
+  padding: 8px 38px 8px 12px; /* Uniform space for right-hand floating badges */
+  font-size: 0.95rem;
+  border: 2px solid rgb(102, 102, 102);
+  border-radius: 7px;
+  background-color: white;
+  color: black;
+  box-sizing: border-box;
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.app-input-field:focus {
+  border-color: #42b883;
+}
+
+/* --- 2. Shared Interactive Floating Badge --- */
+.app-action-badge {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(
+    -50%
+  ); /* Only handle the vertical center coordinate shift */
+
+  color: rgb(102, 102, 102);
+  background-color: #ffffff7e;
+  border: 1.5px solid rgb(102, 102, 102);
+  border-radius: 50%;
+
+  /* Fixed identical geometric dimensions */
+  width: 22px;
+  height: 22px;
+
+  /* Flexbox cross-axis centering grid layout */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  /* Set the target visual scale natively instead of using scale() layout squishing */
+  font-size: 1rem !important;
+  line-height: 1;
+
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: all 0.15s ease;
+}
+
+/* Hover container wrapper triggers - grows the badge to standard structural size */
+.app-input-wrapper-hover:hover .app-action-badge {
+  background-color: #ffffff;
+  width: 26px;
+  height: 26px;
+  font-size: 1.2rem !important;
+}
+
+.app-action-badge-interactive:hover {
+  background-color: #ddffdd;
+  color: #00cc00;
+  border-color: #00cc00;
+}
+
+.app-input-wrapper-hover:hover .app-action-badge-interactive:disabled {
+  background-color: #dddddd;
+  color: rgb(102, 102, 102);
+  border-color: rgb(102, 102, 102);
+  width: 22px;
+  height: 22px;
+  font-size: 1rem !important;
+  cursor: not-allowed;
+}

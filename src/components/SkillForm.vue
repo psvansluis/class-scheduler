@@ -1,6 +1,6 @@
 <template>
   <div id="skill-form">
-    <h3>Skill Form</h3>
+    <h3>Skills</h3>
 
     <span class="add-skill-pill">
       <NameInput

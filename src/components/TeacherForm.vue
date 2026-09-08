@@ -1,6 +1,6 @@
 <template>
   <div id="teacher-form">
-    <h3>Teacher Form</h3>
+    <h3>Teachers</h3>
     <NameInput
       id="teacher-name-input"
       v-model="rawName"
