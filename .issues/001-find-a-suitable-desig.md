@@ -22,6 +22,7 @@ The project is a **Vue 3 + TypeScript + Vite SPA** — a class scheduler. Curren
 ## Requirements
 
 ### Must-have
+
 - **Form inputs** — styled text inputs, selects, checkboxes, toggles (replacing `.app-input-field`)
 - **Tooltips** — accessible, keyboard-friendly
 - **Tables** — at minimum styled HTML tables; sortable/filterable behaviour is a plus
@@ -33,11 +34,13 @@ The project is a **Vue 3 + TypeScript + Vite SPA** — a class scheduler. Curren
 - **Custom colour injection** — SkillPill derives `hsl(...)` from a slug hash as an inline `backgroundColor`. The design system must not fight inline styles.
 
 ### Should-have
+
 - Tree-shakeable bundle (SPA; longer initial load acceptable but not wasteful)
 - `@material-design-icons/font` compatibility (currently used; SVG alternatives acceptable for bundle size)
 - Accessibility at best-effort level (WCAG AA for interactive elements)
 
 ### Won't-have (out of scope)
+
 - Server-side rendering / SSR support
 - Strict WCAG AAA compliance
 - Salesforce SLDS integration
@@ -46,16 +49,16 @@ The project is a **Vue 3 + TypeScript + Vite SPA** — a class scheduler. Curren
 
 A full research and grilling session was conducted. Libraries assessed:
 
-| Library | Verdict | Key reason |
-|---|---|---|
-| **shadcn-vue** | ✅ **Chosen** | See rationale below |
-| PrimeVue 4 (unstyled) | Runner-up | Best DataTable; revisit if shadcn-vue Table proves limiting |
-| Naive UI | Considered | CSS-in-JS elegant but hard to escape its own aesthetic |
-| DaisyUI 5 | Partial use | CSS-only; excellent for named theme token presets alongside shadcn-vue |
-| Vuetify 3 | Rejected | Material Design lock-in; incompatible with wild themes in ticket 003 |
-| Headless UI | Rejected | Too thin a component catalog for CRUD use |
-| Reka UI | Indirect | shadcn-vue is built on Reka UI primitives |
-| SLDS | Rejected | No maintained Vue 3 wrapper; Salesforce-brand-only; ~500 KB CSS |
+| Library               | Verdict       | Key reason                                                             |
+| --------------------- | ------------- | ---------------------------------------------------------------------- |
+| **shadcn-vue**        | ✅ **Chosen** | See rationale below                                                    |
+| PrimeVue 4 (unstyled) | Runner-up     | Best DataTable; revisit if shadcn-vue Table proves limiting            |
+| Naive UI              | Considered    | CSS-in-JS elegant but hard to escape its own aesthetic                 |
+| DaisyUI 5             | Partial use   | CSS-only; excellent for named theme token presets alongside shadcn-vue |
+| Vuetify 3             | Rejected      | Material Design lock-in; incompatible with wild themes in ticket 003   |
+| Headless UI           | Rejected      | Too thin a component catalog for CRUD use                              |
+| Reka UI               | Indirect      | shadcn-vue is built on Reka UI primitives                              |
+| SLDS                  | Rejected      | No maintained Vue 3 wrapper; Salesforce-brand-only; ~500 KB CSS        |
 
 ## Decision: shadcn-vue
 
@@ -64,33 +67,39 @@ A full research and grilling session was conducted. Libraries assessed:
 ### Rationale
 
 1. **Scoped styles are the root problem.** Tailwind utility classes are global by definition — no specificity wars, no hidden cross-component dependencies, consistent tokens everywhere.
-2. **Wild theming is a hard requirement** (ticket 003 plans Gothic, TempleOS, 70s retro, Corporate themes). shadcn-vue components live in `src/components/ui/` in *your codebase* — themes are CSS variable swaps on `<html>`. No fighting a library's defaults.
+2. **Wild theming is a hard requirement** (ticket 003 plans Gothic, TempleOS, 70s retro, Corporate themes). shadcn-vue components live in `src/components/ui/` in _your codebase_ — themes are CSS variable swaps on `<html>`. No fighting a library's defaults.
 3. **Replaces current CSS abstractions cleanly.** `.app-input-field` becomes `<UiInput>`. `.app-action-badge` becomes `<UiButton size="icon">`. Components are owned, not installed as a black box.
 4. **Vue ecosystem learning.** Reka UI exposes composables and the headless/slots pattern. Tailwind Variants is used for component variants.
 5. **SkillPill inline styles are unaffected.** Dynamic computed `hsl(...)` as an inline style coexists with Tailwind's class-based system without conflict.
 
 ### Theming approach
+
 - CSS custom properties (`--primary`, `--background`, `--foreground`, `--radius`, etc.) defined in `:root` or `[data-theme="..."]` in global CSS
 - Theme swap = swap CSS variable values on `<html>` — no JS re-render required
 - **DaisyUI 5** may be introduced alongside shadcn-vue purely for its 35+ pre-built named themes as token starting points for ticket 003. The two are compatible (both use CSS vars on `<html>`).
 
 ### Icon system
+
 - Continue using `@material-design-icons/font` (import CSS globally; use `<span class="material-icons">` in templates)
 - For production bundle optimisation, consider migrating to `vue-material-design-icons` (SVG, tree-shakeable) as a follow-up
 
 ## Implementation Plan
 
 ### Phase 1 — Install Tailwind CSS v4 + shadcn-vue
+
 ```bash
 npm install tailwindcss @tailwindcss/vite
 npx shadcn-vue@latest init
 ```
+
 - Add `@tailwindcss/vite` plugin to `vite.config.ts`
 - Add `@import "tailwindcss"` to `src/style.css`
 - Remove existing global utility classes after component migration
 
 ### Phase 2 — Migrate existing components
+
 Priority order (most painful first):
+
 1. `SkillSelector.vue` — uses `.app-input-field` + `.app-action-badge` most heavily
 2. `NameInput.vue` — uses `.app-input-field`
 3. `CourseForm.vue`, `TeacherForm.vue`, `SkillForm.vue` — form inputs + buttons
@@ -99,6 +108,7 @@ Priority order (most painful first):
 6. `ClassroomSpinner.vue`, `ScheduleResult.vue` — lowest priority
 
 ### Phase 3 — Add missing components (not yet built)
+
 - Sidebar navigation (shadcn-vue `Sheet` or `NavigationMenu`)
 - Tooltip (shadcn-vue `Tooltip` built on Reka UI)
 - DataTable (shadcn-vue `Table` + TanStack Table for sorting/filtering if needed)
