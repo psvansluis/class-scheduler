@@ -9,10 +9,12 @@
     "preview": "vite preview",
     "test:prolog": "tsx prolog/runner.ts",
     "test:playwright": "npx playwright test",
-    "test": "npm run test:prolog && npm run test:playwright"
+    "test": "npm run test:prolog && npm run test:playwright",
+    "issue": "tsx scripts/new-issue.ts"
   },
   "dependencies": {
     "@material-design-icons/font": "^0.14.15",
+    "change-case": "^5.4.4",
     "js-base64": "^3.7.8",
     "lz-string": "^1.5.0",
     "swipl-wasm": "^7.0.10",
