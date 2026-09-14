@@ -21,16 +21,19 @@ Following the timeslot and teacher scheduling architecture established in ticket
    - Modeled via CLP(FD) constraint: all slot indices assigned to a given `Room` must be `all_distinct`.
 2. **Room Assignment Flexibility:**
    - Not all classes of a given course need to be held in the exact same room (e.g. lecture classes in Room A, practical lab classes in Lab B).
-3. **Room Capabilities / Specialization:**
+3. **Room Facilities:**
    - Courses may require specific room features (e.g. Science Lab, Computer Room, Gymnasium).
-   - Rooms can be associated with supported facilities/skills, matching course room requirements similarly to how teachers match skills.
-4. **Scheduled Unit Integration:**
+   - An atomic `Facility` should be introduced. A room can have any amount of supported facilities, or none.
+   - Courses can be associated with required facilities, matching course room requirements similarly to how teachers match skills.
+4. **Capacity**
+   - A room has an integer maximum of students who can use it for a given class.
+5. **Scheduled Unit Integration:**
    - Extends the atomic class representation:
      `class(Course, ClassIndex, Teacher, Room, Cohort, slot(Day, Period))`
 
 ## Acceptance Criteria
 
-- [ ] Rooms defined as entities with optional special equipment/capabilities.
+- [ ] Rooms defined as entities with optional special facilities.
 - [ ] Courses can optionally specify room type requirements.
 - [ ] Solver assigns a suitable room to each scheduled class instance.
 - [ ] Two classes are never scheduled in the same room at the same timeslot.

@@ -26,7 +26,9 @@ Following the timeslot architecture established in ticket 007, student groups mu
    - Modeled via CLP(FD): all slot indices assigned to a given `Cohort` must be `all_distinct`.
 4. **Homework & Fatigue Spacing:**
    - Cohorts benefit heavily from the spacing constraints developed in ticket 007 (e.g. avoiding two heavy academic classes back-to-back, or ensuring homework gaps between sessions).
-5. **Scheduled Unit Integration:**
+5. **Size**
+   - A cohort consists of an integer number of students. A given Course can be taught to multiple cohorts at a time, but only to the extent that the Room has Capacity for it.
+6. **Scheduled Unit Integration:**
    - Integrates with the atomic class representation:
      `class(Course, ClassIndex, Teacher, Room, Cohort, slot(Day, Period))`
 
