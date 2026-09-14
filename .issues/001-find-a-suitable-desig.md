@@ -62,7 +62,7 @@ A full research and grilling session was conducted. Libraries assessed:
 
 ## Decision: shadcn-vue
 
-**shadcn-vue** (https://shadcn-vue.com) — built on **Reka UI** (accessibility primitives, formerly Radix Vue) + **Tailwind CSS**.
+**shadcn-vue** (<https://shadcn-vue.com>) — built on **Reka UI** (accessibility primitives, formerly Radix Vue) + **Tailwind CSS**.
 
 ### Rationale
 
