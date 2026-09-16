@@ -38,7 +38,7 @@ To achieve declarative constraints, expressive arithmetic, and clean search prun
 course_classes(algebra, 3). % Requires 3 classes: indices 1, 2, 3
 
 % Temporal constraints between class indices
-course_constraint(algebra, successive(1, 2)).      % Classes 1 & 2 are back-to-back on same day
+course_constraint(algebra, successive(1, 2)).      % Classes 1 & 2 are back-to-back on the same day
 course_constraint(algebra, min_day_gap(2, 3, 1)).  % At least 1 day between class 2 and class 3
 
 % Teacher availability allow-list
