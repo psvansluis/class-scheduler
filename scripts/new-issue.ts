@@ -27,22 +27,20 @@ async function getTitle(): Promise<string> {
   }
 }
 
-function renderContent(template: string, slug: string, title: string): string {
+function renderContent(slug: string, title: string): string {
   const date = new Date().toLocaleDateString("en-CA");
-  const values: Record<string, string> = {
-    id: slug,
-    slug: slug,
-    title: title,
-    date: date,
-    slug_and_title: `${slug} - ${title}`,
-  };
 
-  return template.replace(
-    /\{\s*\{\s*([a-zA-Z0-9_-]+)\s*\}\s*\}/gi,
-    (match, key: string) => {
-      return values[key.toLowerCase().replace(/-/g, "_")] ?? match;
-    },
-  );
+  return `---
+id: ${slug}
+title: ${title}
+status: open # open | in-progress | closed
+priority: medium # low | medium | high
+assignee:
+labels: []
+created: ${date}
+---
+
+# ${slug} - ${title}`;
 }
 
 async function main(): Promise<void> {
@@ -58,11 +56,15 @@ async function main(): Promise<void> {
   const filename = `${kebabCase(`${slug} ${title}`.slice(0, 25))}.md`;
   const filePath = path.join(issuesDir, filename);
 
-  const template = fs.existsSync(templateFile)
-    ? fs.readFileSync(templateFile, "utf8")
-    : `---\nid: {{ID}}\ntitle: {{TITLE}}\nstatus: open\ncreated: {{DATE}}\n---\n\n# {{SLUG}} - {{TITLE}}\n`;
+  const body = fs.existsSync(templateFile)
+    ? "\n" + fs.readFileSync(templateFile, "utf8").trim() + "\n"
+    : "";
 
-  fs.writeFileSync(filePath, renderContent(template, slug, title), "utf8");
+  const header = renderContent(slug, title);
+
+  const template = `${header}\n${body}`;
+
+  fs.writeFileSync(filePath, template, "utf8");
   console.log(`Created issue #${slug}: .issues/${filename}`);
 }
 
