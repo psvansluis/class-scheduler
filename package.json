@@ -10,7 +10,8 @@
     "test:prolog": "tsx prolog/runner.ts",
     "test:playwright": "npx playwright test",
     "test": "npm run test:prolog && npm run test:playwright",
-    "issue": "tsx scripts/new-issue.ts"
+    "issue": "tsx scripts/new-issue.ts",
+    "typecheck:ts7": "node node_modules/typescript-7/bin/tsc -p tsconfig.node.json --noEmit"
   },
   "dependencies": {
     "@material-design-icons/font": "^0.14.15",
@@ -28,9 +29,10 @@
     "@vitejs/plugin-vue": "^6.0.6",
     "@vue/tsconfig": "^0.9.1",
     "tsx": "^4.22.4",
-    "typescript": "~6.0.2",
+    "typescript": "npm:@typescript/typescript6@^6.0.0",
+    "typescript-7": "npm:typescript@^7.0.2",
     "vite": "^8.0.12",
     "vite-plugin-static-copy": "^4.1.0",
-    "vue-tsc": "^3.2.8"
+    "vue-tsc": "^3.3.11"
   }
 }
