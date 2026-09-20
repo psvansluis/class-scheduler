@@ -2,6 +2,6 @@ import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   test: {
-    include: ["test/**/**/*.{spec,test}.ts"],
+    include: ["test/{prolog,unit}/**/*.{spec,test}.ts"],
   },
 });

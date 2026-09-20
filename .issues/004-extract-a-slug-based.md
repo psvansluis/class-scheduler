@@ -1,7 +1,7 @@
 ---
 id: 004
 title: Extract a slug-based colour composable from SkillPill.vue
-status: open # open | in-progress | closed
+status: closed # open | in-progress | closed
 priority: medium # low | medium | high
 assignee:
 labels: [refactor, composable, a11y]
@@ -117,9 +117,9 @@ const { bgColour, textColour } = useSlugColour(
 
 ## Acceptance Criteria
 
-- [ ] `useSlugColour` composable extracted to `src/composables/useSlugColour.ts`
-- [ ] Supports `hueMin`, `hueMax`, `satMin`, `satMax`, `lightnessMin`, `lightnessMax`
-- [ ] Hue wrapping around 360° is correctly calculated and verified with unit tests (e.g. 350° to 20°)
-- [ ] Text colour automatically selects the higher-contrast option between `textOnLight` (default black) and `textOnDark` (default white) using WCAG contrast calculation
-- [ ] `SkillPill.vue` uses `useSlugColour` without breaking existing visual styling on default theme
-- [ ] Unit tests cover slug hashing consistency, hue wrapping, and contrast selection
+- [x] `useSlugColour` composable extracted to `src/composables/useSlugColour.ts`
+- [x] Supports `hueMin`, `hueMax`, `satMin`, `satMax`, `lightnessMin`, `lightnessMax`
+- [x] Hue wrapping around 360° is correctly calculated and verified with unit tests (e.g. 350° to 20°)
+- [x] Text colour automatically selects the higher-contrast option between `textOnLight` (default black) and `textOnDark` (default white) using WCAG contrast calculation
+- [x] `SkillPill.vue` uses `useSlugColour` without breaking existing visual styling on default theme
+- [x] Unit tests cover slug hashing consistency, hue wrapping, and contrast selection

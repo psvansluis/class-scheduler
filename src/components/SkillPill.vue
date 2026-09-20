@@ -1,11 +1,5 @@
 <template>
-  <div
-    class="skill-pill"
-    :style="{
-      backgroundColor: bgColour.toRgbString(),
-      color: textColour.toRgbString(),
-    }"
-  >
+  <div class="skill-pill" :style="pillStyle">
     <span class="pill-label">{{ label }}</span>
     <button
       class="material-icons-outlined delete-btn"
@@ -39,7 +33,14 @@ defineEmits<{
 }>();
 
 const label = computed(() => slugToLabel(props.slug).label);
-const { bgColour, textColour } = useSlugColour(props.slug);
+
+const pillStyle = computed(() => {
+  const { bgColour, textColour } = useSlugColour(props.slug);
+  return {
+    backgroundColor: bgColour.toRgbString(),
+    color: textColour.toRgbString(),
+  };
+});
 </script>
 
 <style scoped>
