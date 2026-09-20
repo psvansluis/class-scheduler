@@ -93,19 +93,17 @@ flowchart TD
 The project features a dual-layer automated testing setup covering both low-level logic rules and end-to-end browser workflows:
 
 ```bash
-# Run both Prolog logic tests and Playwright E2E tests
+# Run both Prolog+JS logic tests and Playwright E2E tests
 npm test
 ```
 
-### 1. Prolog Engine Unit Tests (`PlUnit`)
+### 1. Prolog Engine and JavaScript Unit Tests
 
-Runs Prolog specifications directly in Node.js via `swipl-wasm` without needing a native Prolog installation:
+Runs specifications directly in Node.js via `swipl-wasm` without needing a native Prolog installation:
 
 ```bash
-npm run test:prolog
+npm run test:unit
 ```
-
-Tests reside in [`prolog/tests.pl`](prolog/tests.pl) and are orchestrated by [`prolog/runner.ts`](prolog/runner.ts).
 
 ### 2. Playwright End-to-End Tests
 
@@ -114,11 +112,6 @@ Verifies DOM interactions, hash-based URL hydration, and query resolution in a r
 ```bash
 npm run test:playwright
 ```
-
-Spec files are located in [`e2e/`](e2e/):
-
-- [`e2e/routing.spec.ts`](e2e/routing.spec.ts): Verifies hash-history navigation.
-- [`e2e/prolog.spec.ts`](e2e/prolog.spec.ts): Fills out the form and validates end-to-end solver execution.
 
 ---
 
@@ -129,7 +122,7 @@ Spec files are located in [`e2e/`](e2e/):
 | `npm run dev`             | Starts the Vite development server with Prolog rule middleware               |
 | `npm run build`           | Validates TypeScript with `vue-tsc` and bundles static assets for production |
 | `npm run preview`         | Previews the production build locally                                        |
-| `npm run test:prolog`     | Executes Prolog unit tests via `swipl-wasm` in Node.js                       |
+| `npm run test:unit`       | Executes unit tests via `swipl-wasm` in Node.js                              |
 | `npm run test:playwright` | Runs headless Playwright E2E browser tests                                   |
 | `npm test`                | Runs the full test suite (Prolog unit tests + Playwright E2E)                |
 | `npm run issue`           | CLI utility to generate numbered issue markdown templates in `.issues/`      |
