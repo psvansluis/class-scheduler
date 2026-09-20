@@ -25,6 +25,7 @@
     "vite.config.ts",
     "prolog/**/*.ts",
     "e2e/**/*.ts",
-    "scripts/**/*.ts"
+    "scripts/**/*.ts",
+    "test/**/*.ts"
   ]
 }

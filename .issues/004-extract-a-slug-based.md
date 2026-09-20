@@ -15,8 +15,8 @@ created: 2026-09-11
 `src/components/SkillPill.vue` currently computes background colour inline from a slug hash:
 
 ```ts
-const hue = () => 135 + (hash(props.slug) % 60); // greens: 135–195°
-const sat = () => 70 + (hash(props.slug) % 15); // 70–85%
+const hue = () => 135 + (hash(props.slug) % 60); // greens: 75–195°
+const sat = () => 70 + (hash(props.slug) % 15); // 55–85%
 const colour = computed(() => `hsl(${hue()}, ${sat()}%, 70%)`);
 ```
 
@@ -28,6 +28,8 @@ This logic should be extracted into a reusable, framework-independent composable
 - Accepts ranges for **Hue**, **Saturation**, and **Lightness** (`Min` / `Max` bounds)
 - Correctly supports **Hue wrapping** across 360° (e.g., reds spanning 340° to 20°)
 - Computes contrast-safe text colour by evaluating accessibility (WCAG contrast score) between `textOnLight` vs. `textOnDark` against the computed background colour
+
+NB: the current `hash` function produces both negative and positive numbers.
 
 ## Design Decisions
 

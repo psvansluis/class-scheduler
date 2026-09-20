@@ -1,5 +1,11 @@
 <template>
-  <div class="skill-pill" :style="{ backgroundColor: colour }">
+  <div
+    class="skill-pill"
+    :style="{
+      backgroundColor: bgColour.toRgbString(),
+      color: textColour.toRgbString(),
+    }"
+  >
     <span class="pill-label">{{ label }}</span>
     <button
       class="material-icons-outlined delete-btn"
@@ -15,8 +21,8 @@
 import { computed } from "vue";
 import { slugToLabel } from "../functions/slugify";
 import "@material-design-icons/font";
+import { useSlugColour } from "../functions/useSlugColour";
 import type { PrologSlug } from "../types/slugLabel";
-import { hash } from "../functions/hash";
 
 const props = withDefaults(
   defineProps<{
@@ -33,9 +39,7 @@ defineEmits<{
 }>();
 
 const label = computed(() => slugToLabel(props.slug).label);
-const hue = () => 135 + (hash(props.slug) % 60);
-const sat = () => 70 + (hash(props.slug) % 15);
-const colour = computed(() => `hsl(${hue()}, ${sat()}%, 70%)`);
+const { bgColour, textColour } = useSlugColour(props.slug);
 </script>
 
 <style scoped>
