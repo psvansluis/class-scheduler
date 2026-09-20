@@ -40,7 +40,8 @@ labels: []
 created: ${date}
 ---
 
-# ${slug} - ${title}`;
+# ${slug} - ${title}
+`;
 }
 
 async function main(): Promise<void> {
@@ -55,13 +56,8 @@ async function main(): Promise<void> {
   const slug = getNextSlug();
   const filename = `${kebabCase(`${slug} ${title}`.slice(0, 25))}.md`;
   const filePath = path.join(issuesDir, filename);
-
-  const body = fs.existsSync(templateFile)
-    ? "\n" + fs.readFileSync(templateFile, "utf8").trim() + "\n"
-    : "";
-
+  const body = fs.readFileSync(templateFile, "utf8");
   const header = renderContent(slug, title);
-
   const template = `${header}\n${body}`;
 
   fs.writeFileSync(filePath, template, "utf8");

@@ -1,6 +1,6 @@
 # Declarative Class Scheduler
 
-**In-Browser Timetable Optimization powered by SWI-Prolog & WebAssembly**
+## In-Browser Timetable Optimization powered by SWI-Prolog & WebAssembly
 
 [![Deploy Static Website to GitHub Pages](https://github.com/psvansluis/class-scheduler/actions/workflows/deploy.yml/badge.svg)](https://github.com/psvansluis/class-scheduler/actions/workflows/deploy.yml)
 [![Vue 3](https://img.shields.io/badge/Vue-3.5-4FC08D?logo=vue.js&logoColor=white)](https://vuejs.org/)
