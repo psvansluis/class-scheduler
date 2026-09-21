@@ -7,8 +7,7 @@ describe("useSlugColour (pure)", () => {
     const slug = "Ϝυψ";
     const result1 = useSlugColour(slug);
     const result2 = useSlugColour(slug);
-    expect(result1.bgColour).toStrictEqual(result2.bgColour);
-    expect(result1.textColour).toStrictEqual(result2.textColour);
+    expect(result1).toStrictEqual(result2);
   });
 
   it("handles hue wrapping correctly", () => {

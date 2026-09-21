@@ -27,7 +27,7 @@ export interface SlugColourConfig {
  *
  * @param slug - The identifier string that will be hashed.
  * @param config - Optional overrides for colour ranges and text colours.
- * @returns An object containing `bgColour` (e.g. "hsl(150, 80%, 70%)") and `textColour` (hex string).
+ * @returns An object containing `bgColour` (e.g. "hsl(150, 80%, 70%)") and `textColour`.
  */
 export function useSlugColour(
   slug: string,
