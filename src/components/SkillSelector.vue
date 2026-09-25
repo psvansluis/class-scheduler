@@ -1,15 +1,11 @@
 <template>
-  <div class="flex flex-col gap-2">
+  <div class="flex flex-col gap-2 max-w-sm">
     <Select v-model="pendingSelection" @update:modelValue="addSelected">
-      <SelectTrigger
-        class="w-full border border-brand-border bg-brand-background text-brand-text"
-      >
+      <SelectTrigger class="w-full">
         <SelectValue placeholder="Choose a skill…" />
       </SelectTrigger>
 
-      <SelectContent
-        class="bg-brand-background border border-brand-border text-brand-text"
-      >
+      <SelectContent>
         <SelectItem
           v-for="slug in availableSkills"
           :key="slug"

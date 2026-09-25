@@ -20,9 +20,8 @@ test.describe("Prolog Integration Engine", () => {
     // --- 2. Add Teacher ---
     const teacherForm = page.locator("#teacher-form");
     await teacherForm.locator("#teacher-name-input input").fill("Mr. Jansen");
-    await teacherForm
-      .locator("#skill-dropdown")
-      .selectOption({ label: "chemistry" });
+    await teacherForm.getByRole("combobox").click();
+    await page.getByRole("option", { name: "chemistry" }).click();
     await teacherForm.locator("#add-teacher-button").click();
 
     // Verify list insertion inside scope
@@ -36,9 +35,8 @@ test.describe("Prolog Integration Engine", () => {
     await courseForm
       .locator("#course-name-input input")
       .fill("Organic Chemistry 101");
-    await courseForm
-      .locator("#skill-dropdown")
-      .selectOption({ label: "chemistry" });
+    await courseForm.getByRole("combobox").click();
+    await page.getByRole("option", { name: "chemistry" }).click();
     await courseForm.locator("#add-course-button").click();
 
     const courseRow = courseForm.locator("ul li");

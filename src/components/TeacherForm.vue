@@ -1,6 +1,9 @@
 <template>
-  <div id="teacher-form">
-    <h3>Teachers</h3>
+  <div id="teacher-form" class="space-y-4">
+    <h3 class="text-lg font-semibold tracking-tight text-foreground">
+      Teachers
+    </h3>
+
     <NameInput
       id="teacher-name-input"
       v-model="rawName"
@@ -10,24 +13,56 @@
       @button-pressed="commit"
     />
 
-    <SkillSelector :available-skills="skills" v-model="draftSkills" />
+    <div class="max-w-sm">
+      <SkillSelector :available-skills="skills" v-model="draftSkills" />
+    </div>
 
-    <button id="add-teacher-button" :disabled="!canCommit" @click="commit">
+    <Button
+      id="add-teacher-button"
+      :disabled="!canCommit"
+      class="w-full max-w-sm"
+      @click="commit"
+    >
       Add Teacher
-    </button>
+    </Button>
 
-    <h4 v-if="teachers.size > 0">Registered Teachers</h4>
-    <ul>
-      <li v-for="[slug, properties] in teachers" :key="slug">
-        <strong>{{ slugToLabel(slug).label }}</strong> can teach:
-        <SkillPill
-          v-for="skillSlug in properties.skills"
-          :key="skillSlug"
-          :slug="skillSlug"
-        />
-        <button @click="$emit('removeTeacher', slug)">❌</button>
-      </li>
-    </ul>
+    <div v-if="teachers.size > 0" class="space-y-2 pt-2">
+      <h4 class="text-sm font-medium text-muted-foreground">
+        Registered Teachers
+      </h4>
+      <ul class="space-y-2 max-w-sm">
+        <li
+          v-for="[slug, properties] in teachers"
+          :key="slug"
+          class="flex items-center justify-between gap-2 p-2 rounded-md border border-border bg-card text-card-foreground text-sm shadow-xs"
+        >
+          <div class="flex flex-wrap items-center gap-1.5 min-w-0">
+            <strong class="font-medium text-foreground">{{
+              slugToLabel(slug).label
+            }}</strong>
+            <span
+              v-if="properties.skills.size > 0"
+              class="text-xs text-muted-foreground"
+              >can teach:</span
+            >
+            <SkillPill
+              v-for="skillSlug in properties.skills"
+              :key="skillSlug"
+              :slug="skillSlug"
+            />
+          </div>
+          <Button
+            variant="ghost"
+            size="icon-xs"
+            class="shrink-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+            :aria-label="`Remove teacher ${slugToLabel(slug).label}`"
+            @click="$emit('removeTeacher', slug)"
+          >
+            <PhX :size="14" weight="bold" />
+          </Button>
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
@@ -39,6 +74,8 @@ import SkillSelector from "./SkillSelector.vue";
 import NameInput from "./NameInput.vue";
 import type { TeacherProperties } from "../types/form";
 import SkillPill from "./SkillPill.vue";
+import { Button } from "@/components/ui/button";
+import { PhX } from "@phosphor-icons/vue";
 
 defineProps<{
   skills: Set<PrologSlug<"skill">>;

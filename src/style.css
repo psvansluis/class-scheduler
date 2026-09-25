@@ -6,18 +6,6 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --text: #6b6375;
-  --text-h: #0a1706;
-  --bg: #d1f9d2;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
-
   --serif: "Lora", serif;
   --heading: "Satisfy", cursive;
   --mono: ui-monospace, Consolas, monospace;
@@ -25,17 +13,13 @@
   font-family: 18px/145% var(--serif);
   letter-spacing: 0.18px;
   color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
+  color: var(--foreground);
+  background: var(--background);
   background-image: url("./assets/scribble-light.png");
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
 }
 
 @font-face {
@@ -54,28 +38,50 @@
   font-display: swap;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #014803;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
+:root,
+[data-theme="corporate"] {
+  --background: #ffffff;
+  --foreground: #1a1a1a;
+  --card: #ffffff;
+  --card-foreground: #1a1a1a;
+  --popover: #ffffff;
+  --popover-foreground: #1a1a1a;
+  --primary: #0a3d62;
+  --primary-foreground: #f5f5f5;
+  --secondary: #eef4f8;
+  --secondary-foreground: #0a3d62;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --accent: #ffb400;
+  --accent-foreground: #1a1a1a;
+  --destructive: #b60554;
+  --destructive-foreground: #ffffff;
+  --border: #1e5a8a;
+  --input: #1e5a8a;
+  --ring: #0a3d62;
+  --success: #056764;
+  --error: #b60554;
+  --radius: 0.5rem;
+}
 
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
+.dark,
+[data-theme="gothic"] {
+  --background: #1a1520;
+  --foreground: #c0c0c0;
+  --primary: #4a2d6b;
+  --primary-foreground: #f0e68c;
+  --border: #3d2c52;
+  --input: #3d2c52;
+  --ring: #aa3bff;
+  --accent: #aa3bff;
+  --accent-foreground: #ffffff;
+  --radius: 0.25rem;
 }
 
 body {
   margin: 0;
+  background-color: var(--background);
+  color: var(--foreground);
 }
 
 h1,
@@ -83,7 +89,7 @@ h2,
 h3 {
   font-family: var(--heading);
   font-weight: 500;
-  color: var(--text-h);
+  color: var(--foreground-header);
 }
 
 h1 {
@@ -108,90 +114,31 @@ h2 {
 * {
   font-family: var(--serif);
 }
-.app-input-field {
-  width: 100%;
-  padding: 8px 38px 8px 12px; /* Uniform space for right-hand floating badges */
-  font-size: 0.95rem;
-  border: 2px solid rgb(102, 102, 102);
-  border-radius: 7px;
-  background-color: white;
-  color: black;
-  box-sizing: border-box;
-  outline: none;
-  transition:
-    border-color 0.2s ease,
-    background-color 0.2s ease;
-}
-
-.app-input-field:focus {
-  border-color: #42b883;
-}
-
-/* --- 2. Shared Interactive Floating Badge --- */
-.app-action-badge {
-  position: absolute;
-  right: 6px;
-  top: 50%;
-  transform: translateY(
-    -50%
-  ); /* Only handle the vertical center coordinate shift */
-
-  color: rgb(102, 102, 102);
-  background-color: #ffffff7e;
-  border: 1.5px solid rgb(102, 102, 102);
-  border-radius: 50%;
-
-  /* Fixed identical geometric dimensions */
-  width: 22px;
-  height: 22px;
-
-  /* Flexbox cross-axis centering grid layout */
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  /* Set the target visual scale natively instead of using scale() layout squishing */
-  font-size: 1rem !important;
-  line-height: 1;
-
-  cursor: pointer;
-  box-sizing: border-box;
-  transition: all 0.15s ease;
-}
-
-/* Hover container wrapper triggers - grows the badge to standard structural size */
-.app-input-wrapper-hover:hover .app-action-badge {
-  background-color: #ffffff;
-  width: 26px;
-  height: 26px;
-  font-size: 1.2rem !important;
-}
-
-.app-action-badge-interactive:hover {
-  background-color: #ddffdd;
-  color: #00cc00;
-  border-color: #00cc00;
-}
-
-.app-input-wrapper-hover:hover .app-action-badge-interactive:disabled {
-  background-color: #dddddd;
-  color: rgb(102, 102, 102);
-  border-color: rgb(102, 102, 102);
-  width: 22px;
-  height: 22px;
-  font-size: 1rem !important;
-  cursor: not-allowed;
-}
 
 @theme inline {
-  --font-heading: var(--font-sans);
-
-  /* Corporate brand colours (Lightning Design System) */
-  --color-brand-primary: #0a3d62;
-  --color-brand-primary-foreground: #f5f5f5;
-  --color-brand-accent: #ffb400;
-  --color-brand-accent-foreground: #1a1a1a;
-  --color-brand-border: #1e5a8a;
-  --color-brand-background: #ffffff;
-  --color-brand-text: #1a1a1a;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  /* Status tokens */
+  --color-success: var(--success);
+  --color-error: var(--error);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
 }

@@ -1,18 +1,17 @@
 <template>
-  <div id="skill-form">
-    <h3>Skills</h3>
+  <div id="skill-form" class="space-y-3">
+    <h3 class="text-lg font-semibold tracking-tight text-foreground">Skills</h3>
 
-    <span class="add-skill-pill">
-      <NameInput
-        id="skill-name-input"
-        v-model="rawInput"
-        v-model:valid="isValid"
-        placeholder="Skill name"
-        @enter-pressed="commit"
-        @button-pressed="commit"
-      />
-    </span>
-    <div class="skill-pill-container" v-if="skills.size > 0">
+    <NameInput
+      id="skill-name-input"
+      v-model="rawInput"
+      v-model:valid="isValid"
+      placeholder="Skill name"
+      @enter-pressed="commit"
+      @button-pressed="commit"
+    />
+
+    <div v-if="skills.size > 0" class="flex flex-wrap gap-1.5 pt-1">
       <SkillPill
         v-for="slug in skills"
         :key="slug"
@@ -53,11 +52,3 @@ const commit = () => {
   }
 };
 </script>
-
-<style scoped lang="css">
-.skill-pill-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-}
-</style>
