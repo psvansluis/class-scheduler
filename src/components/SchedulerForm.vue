@@ -1,32 +1,59 @@
 <template>
-  <SkillForm
-    :skills="skills"
-    @add-skill="addSkill"
-    @remove-skill="removeSkill"
-  />
-  <TeacherForm
-    :skills="skills"
-    :teachers="teachers"
-    @add-teacher="addTeacher"
-    @remove-teacher="removeTeacher"
-  />
-  <CourseForm
-    :skills="skills"
-    :courses="courses"
-    @add-course="addCourse"
-    @remove-course="removeCourse"
-  ></CourseForm>
-  <button @click="clear">Clear</button>
-  <button @click="save">Save</button>
-  <button @click="submit">View Schedule</button>
+  <div class="space-y-8">
+    <div
+      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start"
+    >
+      <div
+        class="rounded-lg border border-border bg-card p-5 text-card-foreground shadow-xs"
+      >
+        <SkillForm
+          :skills="skills"
+          @add-skill="addSkill"
+          @remove-skill="removeSkill"
+        />
+      </div>
+
+      <div
+        class="rounded-lg border border-border bg-card p-5 text-card-foreground shadow-xs"
+      >
+        <TeacherForm
+          :skills="skills"
+          :teachers="teachers"
+          @add-teacher="addTeacher"
+          @remove-teacher="removeTeacher"
+        />
+      </div>
+
+      <div
+        class="rounded-lg border border-border bg-card p-5 text-card-foreground shadow-xs"
+      >
+        <CourseForm
+          :skills="skills"
+          :courses="courses"
+          @add-course="addCourse"
+          @remove-course="removeCourse"
+        />
+      </div>
+    </div>
+
+    <!-- Action Toolbar -->
+    <div
+      class="flex flex-wrap items-center justify-end gap-3 pt-6 border-t border-border"
+    >
+      <Button variant="outline" @click="clear"> Clear </Button>
+      <Button variant="secondary" @click="save"> Save </Button>
+      <Button @click="submit"> View Schedule </Button>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import SkillForm from "./SkillForm.vue";
 import TeacherForm from "./TeacherForm.vue";
-import type { PrologSlug } from "../types/slugLabel";
 import CourseForm from "./CourseForm.vue";
+import { Button } from "@/components/ui/button";
+import type { PrologSlug } from "../types/slugLabel";
 import type { CourseProperties, Form, TeacherProperties } from "../types/form";
 import { useRoute, useRouter } from "vue-router";
 import { formToStateQuery, stateQueryToForm } from "../functions/stateQuery.ts";
