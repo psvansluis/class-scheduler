@@ -1,7 +1,9 @@
 <template>
-  <div class="spinner-container">
-    <div class="book-page"></div>
-    <p class="loading-text">
+  <div class="flex flex-col items-center justify-center p-8">
+    <div
+      class="book-page size-10 rounded-[4px] border-2 border-border bg-primary shadow-xs"
+    ></div>
+    <p class="mt-4 text-sm text-muted-foreground">
       <slot>{{ title }}.</slot>
     </p>
   </div>
@@ -12,23 +14,8 @@ defineProps({ title: String });
 </script>
 
 <style scoped>
-.spinner-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-}
-
 .book-page {
-  width: 40px;
-  height: 40px;
-  background-color: var(--vt-c-text-dark-2, #42b883);
-  border-color: #666;
-  border-width: 2px;
-  border-style: solid;
   animation: flip-page 1.2s infinite ease-in-out;
-  border-radius: 4px;
 }
 
 @keyframes flip-page {
@@ -41,12 +28,5 @@ defineProps({ title: String });
   100% {
     transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg);
   }
-}
-
-.loading-text {
-  margin-top: 1rem;
-  font-family: monospace;
-  font-size: 0.9rem;
-  color: #666;
 }
 </style>

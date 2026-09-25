@@ -1,11 +1,21 @@
 <template>
-  <div id="app-container">
-    <header>
-      <h1>Declarative Class Scheduler</h1>
-      <nav>
-        <AppLink name="form"> Setup Constraints </AppLink>
-        |
-        <AppLink name="result">View Schedule</AppLink>
+  <div
+    id="app-container"
+    class="max-w-6xl mx-auto px-4 py-8 md:px-8 min-h-screen"
+  >
+    <header class="mb-8">
+      <h1 class="text-3xl font-bold tracking-tight text-foreground mb-4">
+        Declarative Class Scheduler
+      </h1>
+      <nav class="flex items-center gap-2 border-b border-border pb-3">
+        <AppLink
+          v-for:="route in appLinks"
+          :key="route.name"
+          :name="route.name"
+          class="px-3 py-1.5 rounded-md text-sm font-medium text-muted-foreground transition-colors hover:text-foreground hover:bg-accent [&.router-link-active]:bg-primary/10 [&.router-link-active]:text-primary [&.router-link-active]:font-semibold"
+        >
+          {{ route.label }}
+        </AppLink>
       </nav>
     </header>
     <main>
@@ -14,23 +24,9 @@
   </div>
 </template>
 
-<style scoped>
-#app-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-family: sans-serif;
-}
-nav {
-  margin-bottom: 2rem;
-}
-nav a {
-  margin: 0 0.5rem;
-  text-decoration: none;
-  color: #42b983;
-}
-nav a.router-link-active {
-  font-weight: bold;
-  text-decoration: underline;
-}
-</style>
+<script setup lang="ts">
+const appLinks = [
+  { name: "form", label: "Setup Constraints" },
+  { name: "result", label: "View Schedule" },
+];
+</script>
