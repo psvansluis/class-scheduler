@@ -1,6 +1,8 @@
+import type { PrologSlug } from "@/types/slugLabel";
 import { hash } from "./hash";
 import { Colord, colord, extend } from "colord";
 import a11yPlugin from "colord/plugins/a11y";
+import type { StyleValue } from "vue";
 extend([a11yPlugin]);
 
 export interface SlugColourConfig {
@@ -71,3 +73,14 @@ export function useSlugColour(
 
   return { bgColour, textColour };
 }
+
+export const slugToStyle = (
+  slug: PrologSlug<any>,
+  config?: SlugColourConfig,
+): StyleValue => {
+  const { bgColour, textColour } = useSlugColour(slug, config);
+  return {
+    backgroundColor: bgColour.toRgbString(),
+    color: textColour.toRgbString(),
+  };
+};

@@ -35,6 +35,14 @@
           v-for="[slug, properties] in courses"
           :key="slug"
           class="flex items-center justify-between gap-2 p-2 rounded-md border border-border bg-card text-card-foreground text-sm shadow-xs"
+          :style="
+            slugToStyle(slug, {
+              hueMin: 240,
+              hueMax: 290,
+              lightnessMin: 85,
+              lightnessMax: 95,
+            })
+          "
         >
           <div class="flex flex-wrap items-center gap-1.5 min-w-0">
             <span class="font-medium text-foreground">{{
@@ -76,6 +84,7 @@ import { labelToSlug, slugToLabel } from "../functions/slugify";
 import type { CourseProperties } from "../types/form";
 import { Button } from "@/components/ui/button";
 import { PhX } from "@phosphor-icons/vue";
+import { slugToStyle } from "@/functions/useSlugColour.ts";
 
 type CourseSlug = PrologSlug<"course">;
 

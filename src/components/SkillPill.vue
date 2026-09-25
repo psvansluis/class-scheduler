@@ -1,6 +1,6 @@
 <template>
   <div
-    class="skill-pill group relative inline-flex items-center rounded-lg border border-black/15 dark:border-white/20 px-3 py-1 text-sm font-medium shadow-2xs transition-all"
+    class="skill-pill group relative gap-2 p-2 inline-flex rounded-lg border border-border bg-card text-card-foreground text-sm shadow-xs transition-all px-3"
     :style="pillStyle"
   >
     <span class="pill-label whitespace-nowrap font-medium select-none">{{
@@ -21,7 +21,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { slugToLabel } from "../functions/slugify";
-import { useSlugColour } from "../functions/useSlugColour";
+import { slugToStyle } from "../functions/useSlugColour";
 import type { PrologSlug } from "../types/slugLabel";
 import { PhTrashSimple } from "@phosphor-icons/vue";
 
@@ -41,11 +41,5 @@ defineEmits<{
 
 const label = computed(() => slugToLabel(props.slug).label);
 
-const pillStyle = computed(() => {
-  const { bgColour, textColour } = useSlugColour(props.slug);
-  return {
-    backgroundColor: bgColour.toRgbString(),
-    color: textColour.toRgbString(),
-  };
-});
+const pillStyle = computed(() => slugToStyle(props.slug));
 </script>
