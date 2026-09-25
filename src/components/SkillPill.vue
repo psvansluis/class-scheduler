@@ -1,12 +1,19 @@
 <template>
-  <div class="skill-pill" :style="pillStyle">
-    <span class="pill-label">{{ label }}</span>
+  <div
+    class="skill-pill group relative inline-flex items-center rounded-lg border border-black/15 dark:border-white/20 px-3 py-1 text-sm font-medium shadow-2xs transition-all"
+    :style="pillStyle"
+  >
+    <span class="pill-label whitespace-nowrap font-medium select-none">{{
+      label
+    }}</span>
     <button
-      class="material-icons-outlined delete-btn"
       v-if="removable"
+      type="button"
+      class="delete-btn absolute -top-2 -right-2 flex size-4.5 items-center justify-center rounded-full border border-black/20 bg-background text-foreground/80 shadow-xs transition-transform duration-150 scale-75 group-hover:scale-100 hover:scale-110 hover:bg-destructive hover:text-destructive-foreground hover:border-destructive cursor-pointer"
+      :aria-label="`Remove skill ${label}`"
       @click="$emit('removeSkill')"
     >
-      delete
+      <PhTrashSimple :size="11" weight="bold" />
     </button>
   </div>
 </template>
@@ -14,9 +21,9 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { slugToLabel } from "../functions/slugify";
-import "@material-design-icons/font";
 import { useSlugColour } from "../functions/useSlugColour";
 import type { PrologSlug } from "../types/slugLabel";
+import { PhTrashSimple } from "@phosphor-icons/vue";
 
 const props = withDefaults(
   defineProps<{
@@ -42,55 +49,3 @@ const pillStyle = computed(() => {
   };
 });
 </script>
-
-<style scoped>
-.skill-pill {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  color: black;
-  border: 2px solid rgb(102, 102, 102);
-  border-radius: 7px;
-  margin: 5px;
-  padding: 6px 10px;
-  box-sizing: border-box;
-  transition: padding 0.2s ease;
-}
-
-.pill-label {
-  font-weight: 500;
-  white-space: nowrap;
-}
-
-.skill-pill .delete-btn {
-  position: absolute;
-  top: -6px;
-  right: -6px;
-  font-size: 0.95rem;
-  color: rgb(102, 102, 102);
-  background-color: #ffffff7e;
-  border: 1.5px solid rgb(102, 102, 102);
-  border-radius: 50%;
-  width: 18px;
-  height: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transform: scale(0.6);
-  transition:
-    transform 0.15s ease,
-    background-color 0.15s ease;
-}
-
-.skill-pill:hover .delete-btn {
-  background-color: #ffffff;
-  transform: scale(1);
-}
-
-.skill-pill .delete-btn:hover {
-  background-color: #ffdddd;
-  color: #cc0000;
-  border-color: #cc0000;
-}
-</style>
