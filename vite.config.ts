@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import fs from "fs";
 import path from "path";
+import tailwindcss from "@tailwindcss/vite";
 
 // --- CONFIGURATION MANAGEMENT ---
 const resolvePath = (p: string) => path.resolve(__dirname, p);
@@ -45,6 +46,7 @@ const copySingleAsset = (srcDir: string, destDir: string, file: string) => {
 export default defineConfig({
   plugins: [
     vue(),
+    tailwindcss(),
     {
       name: "serve-and-build-prolog",
 
@@ -88,5 +90,10 @@ export default defineConfig({
       },
     },
   ],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, 'src')
+    }
+  },
   base: "/class-scheduler/",
 });

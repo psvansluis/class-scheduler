@@ -36,7 +36,6 @@ The project is a **Vue 3 + TypeScript + Vite SPA** — a class scheduler. Curren
 ### Should-have
 
 - Tree-shakeable bundle (SPA; longer initial load acceptable but not wasteful)
-- `@material-design-icons/font` compatibility (currently used; SVG alternatives acceptable for bundle size)
 - Accessibility at best-effort level (WCAG AA for interactive elements)
 
 ### Won't-have (out of scope)
@@ -80,8 +79,9 @@ A full research and grilling session was conducted. Libraries assessed:
 
 ### Icon system
 
-- Continue using `@material-design-icons/font` (import CSS globally; use `<span class="material-icons">` in templates)
-- For production bundle optimisation, consider migrating to `vue-material-design-icons` (SVG, tree-shakeable) as a follow-up
+- Migrate away from material design
+- Use the phosphor library defined in components.json
+- Delete material design fonts import after migration
 
 ## Implementation Plan
 

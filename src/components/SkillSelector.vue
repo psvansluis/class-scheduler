@@ -1,32 +1,27 @@
 <template>
-  <div class="skill-selector-field">
-    <label for="skill-dropdown" class="selector-label">Assign Skills</label>
+  <div class="flex flex-col gap-2">
+    <Select v-model="pendingSelection" @update:modelValue="addSelected">
+      <SelectTrigger
+        class="w-full border border-brand-border bg-brand-background text-brand-text"
+      >
+        <SelectValue placeholder="Choose a skill…" />
+      </SelectTrigger>
 
-    <div class="input-row">
-      <div class="select-wrapper app-input-wrapper-hover">
-        <select
-          id="skill-dropdown"
-          v-model="pendingSelection"
-          class="app-input-field"
-          @change="addSelected"
+      <SelectContent
+        class="bg-brand-background border border-brand-border text-brand-text"
+      >
+        <SelectItem
+          v-for="slug in availableSkills"
+          :key="slug"
+          :value="slug"
+          :disabled="modelValue.has(slug)"
         >
-          <option :value="null" disabled>Choose a skill to assign...</option>
-          <option
-            v-for="slug in availableSkills"
-            :key="slug"
-            :value="slug"
-            :disabled="modelValue.has(slug)"
-          >
-            {{ slugToLabel(slug).label }}
-          </option>
-        </select>
-        <span class="material-icons-outlined app-action-badge dropdown-badge">
-          arrow_drop_down
-        </span>
-      </div>
-    </div>
+          {{ slugToLabel(slug).label }}
+        </SelectItem>
+      </SelectContent>
+    </Select>
 
-    <div class="assigned-pills">
+    <div class="flex flex-wrap gap-1 mt-1 min-h-[2rem]">
       <SkillPill
         v-for="slug in modelValue"
         :key="slug"
@@ -44,6 +39,13 @@ import { slugToLabel } from "../functions/slugify";
 import type { PrologSlug } from "../types/slugLabel";
 import SkillPill from "./SkillPill.vue";
 import "@material-design-icons/font";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 
 defineProps<{
   availableSkills: Set<PrologSlug<"skill">>;
@@ -66,50 +68,3 @@ const removeSelected = (slug: PrologSlug<"skill">) => {
   modelValue.value.delete(slug);
 };
 </script>
-
-<style scoped>
-.skill-selector-field {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 15px;
-}
-
-.selector-label {
-  font-weight: 600;
-  font-size: 0.95rem;
-  color: #333;
-}
-
-.input-row {
-  display: flex;
-  max-width: 350px;
-}
-
-.select-wrapper {
-  position: relative;
-  flex: 1;
-}
-
-.select-wrapper select {
-  appearance: none;
-  cursor: pointer;
-}
-
-.dropdown-badge {
-  pointer-events: none; /* Let select element register the click context */
-}
-
-.select-wrapper select:focus + .dropdown-badge {
-  border-color: #42b883;
-  color: #42b883;
-}
-
-.assigned-pills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2px;
-  margin-top: 4px;
-  min-height: 40px;
-}
-</style>
