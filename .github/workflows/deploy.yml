@@ -43,8 +43,8 @@ jobs:
       - name: Validate TypeScript and Vue Templates
         run: npx vue-tsc --noEmit
 
-      - name: Run Prolog Tests
-        run: npm run test:prolog
+      - name: Run Unit Tests
+        run: npm run test:unit
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
