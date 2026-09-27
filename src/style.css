@@ -3,8 +3,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
-
 :root {
   --serif: "Lora", serif;
   --heading: "Satisfy", cursive;
@@ -15,7 +13,6 @@
   color-scheme: light dark;
   color: var(--foreground);
   background: var(--background);
-  background-image: url("./assets/scribble-light.png");
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -40,7 +37,8 @@
 
 :root,
 [data-theme="corporate"] {
-  --background: #ffffff;
+  color-scheme: light;
+  --background: #f5f5ff;
   --foreground: #1a1a1a;
   --card: #ffffff;
   --card-foreground: #1a1a1a;
@@ -64,23 +62,32 @@
   --radius: 0.5rem;
 }
 
-.dark,
 [data-theme="gothic"] {
+  color-scheme: dark;
   --background: #1a1520;
   --foreground: #c0c0c0;
+  --card-foreground: #ffffff;
+  --card: #150612;
+  --popover: #150612;
+  --popover-foreground: #ffffff;
   --primary: #4a2d6b;
   --primary-foreground: #f0e68c;
+  --secondary: #56134b;
+  --secondary-foreground: #e4e1d7;
   --border: #3d2c52;
   --input: #3d2c52;
   --ring: #aa3bff;
   --accent: #aa3bff;
   --accent-foreground: #ffffff;
+  --success: hsl(178, 91%, 45%);
+  --error: hsl(333, 95%, 50%);
   --radius: 0.25rem;
 }
 
 body {
   margin: 0;
   background-color: var(--background);
+  background-image: url("./assets/scribble-light.png");
   color: var(--foreground);
 }
 
@@ -112,7 +119,7 @@ h3 {
   --color-ring: var(--ring);
   --color-success: var(--success);
   --color-error: var(--error);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) * 0.5);
+  --radius-md: calc(var(--radius) * 0.75);
   --radius-lg: var(--radius);
 }

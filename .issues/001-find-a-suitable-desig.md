@@ -120,13 +120,13 @@ Priority order (most painful first):
 
 ## Acceptance Criteria
 
-- [ ] Tailwind CSS v4 installed and working in Vite
-- [ ] shadcn-vue CLI initialised; base components generated in `src/components/ui/`
-- [ ] `.app-input-field` and `.app-action-badge` removed from `src/style.css`; all usages migrated to shadcn-vue components
-- [ ] Button icons align correctly without custom CSS
-- [ ] No misaligned button icons
-- [ ] `SkillPill` inline `backgroundColor` still works after migration
-- [ ] Dark mode (`prefers-color-scheme: dark`) still functional after migration
-- [ ] No hardcoded colour literals (`white`, `black`, `#ffffff`, `#000000`) remain in scoped component styles
-- [ ] Reduced CSS maintenance burden (fewer lines in `style.css`, fewer scoped style blocks)
+- [x] Tailwind CSS v4 installed and working in Vite
+- [x] shadcn-vue CLI initialised; base components generated in `src/components/ui/`
+- [x] `.app-input-field` and `.app-action-badge` removed from `src/style.css`; all usages migrated to shadcn-vue components
+- [x] Button icons align correctly without custom CSS
+- [x] No misaligned button icons
+- [x] `SkillPill` inline `backgroundColor` still works after migration
+- [x] Dark mode (`prefers-color-scheme: dark`) still functional after migration
+- [x] No hardcoded colour literals (`white`, `black`, `#ffffff`, `#000000`) remain in scoped component styles
+- [x] Reduced CSS maintenance burden (fewer lines in `style.css`, fewer scoped style blocks)
 - [ ] Maintain capability to import custom colours so that slug-based colour mapping in SkillPill can exist (covered by ticket 004)

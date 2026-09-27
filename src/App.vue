@@ -16,6 +16,7 @@
         >
           {{ route.label }}
         </AppLink>
+        <ThemeSelector class="ml-auto" />
       </nav>
     </header>
     <main>
@@ -25,6 +26,8 @@
 </template>
 
 <script setup lang="ts">
+import ThemeSelector from "@/components/ThemeSelector.vue";
+
 const appLinks = [
   { name: "form", label: "Setup Constraints" },
   { name: "result", label: "View Schedule" },
