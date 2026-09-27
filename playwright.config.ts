@@ -1,5 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
+const baseURL = "http://localhost:4173/class-scheduler/";
+
 export default defineConfig({
   testDir: "./test/e2e",
   fullyParallel: true,
@@ -9,7 +11,7 @@ export default defineConfig({
   reporter: "html",
 
   use: {
-    baseURL: "http://localhost:5173/class-scheduler/",
+    baseURL: baseURL,
     trace: "on-first-retry",
   },
 
@@ -20,10 +22,9 @@ export default defineConfig({
     },
   ],
 
-  // Tell Playwright to spin up your local Vite development server before running tests
   webServer: {
-    command: "npm run dev",
-    url: "http://localhost:5173/class-scheduler/",
+    command: "npm run preview",
+    url: baseURL,
     reuseExistingServer: !process.env.CI,
   },
 });

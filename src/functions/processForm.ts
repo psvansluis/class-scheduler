@@ -5,6 +5,8 @@ import { executeOpenQuery, executeClosedQuery } from "./executeQuery";
 import swipl from "swipl-wasm";
 import { slugToLabel } from "./slugify.ts";
 
+const base = import.meta.env.BASE_URL;
+
 export const processForm = async (
   form: Form,
   factReceiver: string[],
@@ -13,7 +15,6 @@ export const processForm = async (
   const facts = mapFormToFacts(form);
 
   const rulesAndFacts = rules + "\n\n" + facts;
-  console.log(rulesAndFacts);
 
   const swi = await swipl();
   swi.FS.writeFile("/rules.pl", rulesAndFacts);
@@ -30,7 +31,7 @@ export const processForm = async (
 };
 
 const getRules = async (): Promise<string> => {
-  const response = await fetch("/prolog/rules.pl");
+  const response = await fetch(base + "prolog/rules.pl");
   if (!response.ok)
     throw new Error(`Could not locate core rules file: ${response.statusText}`);
   return await response.text();
