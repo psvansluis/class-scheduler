@@ -110,22 +110,28 @@ npm run test:unit
 Verifies DOM interactions, hash-based URL hydration, and query resolution in a real browser environment:
 
 ```bash
-npm run test:playwright
+npm run test:e2e
+```
+
+NB: e2e tests use build artifacts to run, so they only pass after running:
+
+```bash
+npm run build
 ```
 
 ---
 
 ## 🛠 Available Scripts
 
-| Command                   | Purpose                                                                      |
-| :------------------------ | :--------------------------------------------------------------------------- |
-| `npm run dev`             | Starts the Vite development server with Prolog rule middleware               |
-| `npm run build`           | Validates TypeScript with `vue-tsc` and bundles static assets for production |
-| `npm run preview`         | Previews the production build locally                                        |
-| `npm run test:unit`       | Executes unit tests via `swipl-wasm` in Node.js                              |
-| `npm run test:playwright` | Runs headless Playwright E2E browser tests                                   |
-| `npm test`                | Runs the full test suite (Prolog unit tests + Playwright E2E)                |
-| `npm run issue`           | CLI utility to generate numbered issue markdown templates in `.issues/`      |
+| Command             | Purpose                                                                      |
+| :------------------ | :--------------------------------------------------------------------------- |
+| `npm run dev`       | Starts the Vite development server with Prolog rule middleware               |
+| `npm run build`     | Validates TypeScript with `vue-tsc` and bundles static assets for production |
+| `npm run preview`   | Previews the production build locally                                        |
+| `npm run test:unit` | Executes unit tests via `swipl-wasm` in Node.js                              |
+| `npm run test:e2e`  | Runs headless Playwright E2E browser tests                                   |
+| `npm test`          | Runs the full test suite (Prolog unit tests + Playwright E2E)                |
+| `npm run issue`     | CLI utility to generate numbered issue markdown templates in `.issues/`      |
 
 ---
 
