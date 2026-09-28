@@ -1,13 +1,14 @@
 <template>
   <div class="flex items-center gap-2">
-    <label for="theme-select" class="text-sm text-muted-foreground"
-      >Theme</label
-    >
     <Select :model-value="theme" @update:model-value="selectTheme">
-      <SelectTrigger id="theme-select" aria-label="Theme" class="w-36">
-        <SelectValue />
+      <SelectTrigger
+        id="theme-select"
+        aria-label="Theme"
+        class="bg-background/70 w-36"
+      >
+        <SelectValue>Choose a theme...</SelectValue>
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent class="bg-background/70">
         <SelectItem v-for="t in themes" :key="t.value" :value="t.value">
           {{ t.label }}
         </SelectItem>
@@ -43,11 +44,8 @@ const fallbackTheme: Theme = darkPreference.matches ? "gothic" : "corporate";
 const parseTheme = (value: unknown): Theme | undefined =>
   themes.find((t) => t.value === value)?.value;
 
-const applyTheme = (value: Theme) => {
-  const { dataset } = document.documentElement;
-  dataset.theme = value;
-  // classList.toggle("dark", value === "gothic");
-};
+const applyTheme = (value: Theme) =>
+  (document.documentElement.dataset.theme = value);
 
 const syncThemeFromUrl = () => {
   const parsedTheme = parseTheme(route.query.theme) ?? fallbackTheme;

@@ -4,7 +4,7 @@
       class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start"
     >
       <div
-        class="rounded-lg border border-border bg-card p-5 text-card-foreground shadow-xs"
+        class="rounded-lg border border-border bg-card/95 p-5 text-card-foreground shadow-xs"
       >
         <SkillForm
           :skills="skills"
@@ -14,7 +14,7 @@
       </div>
 
       <div
-        class="rounded-lg border border-border bg-card p-5 text-card-foreground shadow-xs"
+        class="rounded-lg border border-border bg-card/95 p-5 text-card-foreground shadow-xs"
       >
         <TeacherForm
           :skills="skills"
@@ -25,7 +25,7 @@
       </div>
 
       <div
-        class="rounded-lg border border-border bg-card p-5 text-card-foreground shadow-xs"
+        class="rounded-lg border border-border bg-card/95 p-5 text-card-foreground shadow-xs"
       >
         <CourseForm
           :skills="skills"

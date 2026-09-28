@@ -7,15 +7,21 @@
       <h1 class="text-3xl font-bold tracking-tight text-foreground mb-4">
         Declarative Class Scheduler
       </h1>
-      <nav class="flex items-center gap-2 border-b border-border pb-3">
-        <AppLink
-          v-for:="route in appLinks"
-          :key="route.name"
-          :name="route.name"
-          class="px-3 py-1.5 rounded-md text-sm font-medium text-muted-foreground transition-colors hover:text-foreground hover:bg-accent [&.router-link-active]:bg-primary/10 [&.router-link-active]:text-primary [&.router-link-active]:font-semibold"
-        >
-          {{ route.label }}
-        </AppLink>
+      <nav class="flex items-center border-b border-border pb-3">
+        <NavigationMenu :viewport="false" class="max-w-none flex-none">
+          <NavigationMenuList class="justify-start">
+            <NavigationMenuItem v-for="route in appLinks" :key="route.name">
+              <NavigationMenuLink as-child>
+                <AppLink
+                  :name="route.name"
+                  class="bg-background/40 [&.router-link-active]:bg-background/70 [&.router-link-active]:font-semibold"
+                >
+                  {{ route.label }}
+                </AppLink>
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+          </NavigationMenuList>
+        </NavigationMenu>
         <ThemeSelector class="ml-auto" />
       </nav>
     </header>
@@ -27,6 +33,12 @@
 
 <script setup lang="ts">
 import ThemeSelector from "@/components/ThemeSelector.vue";
+import {
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+} from "@/components/ui/navigation-menu";
 
 const appLinks = [
   { name: "form", label: "Setup Constraints" },

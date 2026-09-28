@@ -3,6 +3,8 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+@custom-variant dark (&:is(.dark *));
+
 :root {
   --serif: "Lora", serif;
   --heading: "Satisfy", cursive;
@@ -59,7 +61,7 @@
   --ring: #0a3d62;
   --success: #056764;
   --error: #b60554;
-  --radius: 0.5rem;
+  --radius: 0.3rem;
 }
 
 [data-theme="gothic"] {
@@ -81,7 +83,7 @@
   --accent-foreground: #ffffff;
   --success: hsl(178, 91%, 45%);
   --error: hsl(333, 95%, 50%);
-  --radius: 0.25rem;
+  --radius: 0.8rem;
 }
 
 body {
@@ -122,4 +124,14 @@ h3 {
   --radius-sm: calc(var(--radius) * 0.5);
   --radius-md: calc(var(--radius) * 0.75);
   --radius-lg: var(--radius);
+  --font-heading: var(--font-sans);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }

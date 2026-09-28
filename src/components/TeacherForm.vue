@@ -38,12 +38,8 @@
           :style="teacherCardStyle(slug)"
         >
           <div class="flex flex-wrap items-center gap-1.5 min-w-0">
-            <strong class="font-medium text-foreground">{{
-              slugToLabel(slug).label
-            }}</strong>
-            <span
-              v-if="properties.skills.size > 0"
-              class="text-xs text-muted-foreground"
+            <strong class="font-medium">{{ slugToLabel(slug).label }}</strong>
+            <span v-if="properties.skills.size > 0" class="text-xs"
               >can teach:</span
             >
             <SkillPill
