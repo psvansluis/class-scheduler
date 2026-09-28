@@ -27,13 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-const themes = [
-  { label: "Corporate", value: "corporate" },
-  { label: "Gothic", value: "gothic" },
-] as const;
-
-type Theme = (typeof themes)[number]["value"];
+import { themes, type Theme } from "@/functions/theme";
 
 const route = useRoute();
 const router = useRouter();

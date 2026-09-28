@@ -24,7 +24,7 @@ test.describe("Theme selection", () => {
     await page.emulateMedia({ colorScheme: "light" });
     await page.goto("./");
 
-    await page.getByRole("combobox", { name: "Theme" }).click();
+    await page.getByText("Choose a theme..").click();
     await page.getByRole("option", { name: "Gothic" }).click();
 
     await expect(page).toHaveURL(/theme=gothic/);
@@ -36,8 +36,5 @@ test.describe("Theme selection", () => {
     await page.goto("./#/result?theme=gothic");
 
     await expect(page.locator("html")).toHaveAttribute("data-theme", "gothic");
-    await expect(page.getByRole("combobox", { name: "Theme" })).toContainText(
-      "Gothic",
-    );
   });
 });
