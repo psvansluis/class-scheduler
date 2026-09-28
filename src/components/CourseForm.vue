@@ -34,7 +34,7 @@
         <li
           v-for="[slug, properties] in courses"
           :key="slug"
-          class="flex items-center justify-between gap-2 p-2 rounded-md border border-border bg-card text-card-foreground text-sm shadow-xs"
+          class="flex items-center justify-between gap-2 p-2 rounded-md border border-border bg-card text-sm shadow-xs"
           :style="
             slugToStyle(slug, {
               hueMin: 240,
@@ -45,12 +45,12 @@
           "
         >
           <div class="flex flex-wrap items-center gap-1.5 min-w-0">
-            <span class="font-medium text-foreground">{{
+            <span class="font-medium">{{
               slugToLabel(slug).label
             }}</span>
             <span
               v-if="properties.skills.size > 0"
-              class="text-xs text-muted-foreground"
+              class="text-xs"
               >requires:</span
             >
             <SkillPill

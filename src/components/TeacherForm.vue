@@ -34,7 +34,7 @@
         <li
           v-for="[slug, properties] in teachers"
           :key="slug"
-          class="flex items-center justify-between gap-2 p-2 rounded-md border border-border bg-card text-card-foreground text-sm shadow-xs"
+          class="flex items-center justify-between gap-2 p-2 rounded-md border border-border bg-card text-sm shadow-xs"
           :style="teacherCardStyle(slug)"
         >
           <div class="flex flex-wrap items-center gap-1.5 min-w-0">
