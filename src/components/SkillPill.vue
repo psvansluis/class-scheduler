@@ -20,10 +20,13 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
+import { colord } from "colord";
+import { getCurrentTheme } from "../functions/useCurrentTheme";
 import { slugToLabel } from "../functions/slugify";
-import { slugToStyle } from "../functions/useSlugColour";
+import { slugToStyle, type SlugColourConfig } from "../functions/useSlugColour";
 import type { PrologSlug } from "../types/slugLabel";
 import { PhTrashSimple } from "@phosphor-icons/vue";
+import type { Theme } from "@/functions/theme";
 
 const props = withDefaults(
   defineProps<{
@@ -41,5 +44,29 @@ defineEmits<{
 
 const label = computed(() => slugToLabel(props.slug).label);
 
-const pillStyle = computed(() => slugToStyle(props.slug));
+const theme = getCurrentTheme();
+
+const themeSlugColourConfigs: Record<Theme, SlugColourConfig> = {
+  corporate: {
+    hueMin: 135,
+    hueMax: 195,
+    satMin: 70,
+    satMax: 85,
+    lightnessMin: 70,
+    lightnessMax: 80,
+  },
+  gothic: {
+    hueMin: 310,
+    hueMax: 10,
+    satMin: 70,
+    satMax: 85,
+    lightnessMin: 15,
+    lightnessMax: 25,
+    textOnDark: colord("#c0c0c0"),
+  },
+};
+
+const pillStyle = computed(() =>
+  slugToStyle(props.slug, themeSlugColourConfigs[theme.value ?? "corporate"]),
+);
 </script>

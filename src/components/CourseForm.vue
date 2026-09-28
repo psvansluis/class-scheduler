@@ -35,22 +35,11 @@
           v-for="[slug, properties] in courses"
           :key="slug"
           class="flex items-center justify-between gap-2 p-2 rounded-md border border-border bg-card text-sm shadow-xs"
-          :style="
-            slugToStyle(slug, {
-              hueMin: 240,
-              hueMax: 290,
-              lightnessMin: 85,
-              lightnessMax: 95,
-            })
-          "
+          :style="courseCardStyle(slug)"
         >
           <div class="flex flex-wrap items-center gap-1.5 min-w-0">
-            <span class="font-medium">{{
-              slugToLabel(slug).label
-            }}</span>
-            <span
-              v-if="properties.skills.size > 0"
-              class="text-xs"
+            <span class="font-medium">{{ slugToLabel(slug).label }}</span>
+            <span v-if="properties.skills.size > 0" class="text-xs"
               >requires:</span
             >
             <SkillPill
@@ -84,7 +73,13 @@ import { labelToSlug, slugToLabel } from "../functions/slugify";
 import type { CourseProperties } from "../types/form";
 import { Button } from "@/components/ui/button";
 import { PhX } from "@phosphor-icons/vue";
-import { slugToStyle } from "@/functions/useSlugColour.ts";
+import {
+  slugToStyle,
+  type SlugColourConfig,
+} from "@/functions/useSlugColour.ts";
+import { getCurrentTheme } from "../functions/useCurrentTheme";
+import type { Theme } from "@/functions/theme.ts";
+import { colord } from "colord";
 
 type CourseSlug = PrologSlug<"course">;
 
@@ -106,6 +101,7 @@ const emit = defineEmits<{
 }>();
 
 const canCommit = computed<boolean>(() => isValidName.value);
+const theme = getCurrentTheme();
 
 const commit = () => {
   if (!canCommit.value) return;
@@ -120,4 +116,26 @@ const commit = () => {
     console.error(err);
   }
 };
+
+const themeSlugColourConfigs: Record<Theme, SlugColourConfig> = {
+  corporate: {
+    hueMin: 240,
+    hueMax: 290,
+    satMin: 70,
+    satMax: 85,
+    lightnessMin: 85,
+    lightnessMax: 95,
+  },
+  gothic: {
+    hueMin: 240,
+    hueMax: 290,
+    satMin: 20,
+    satMax: 35,
+    lightnessMin: 15,
+    lightnessMax: 25,
+    textOnDark: colord("#c0c0c0"),
+  },
+};
+const courseCardStyle = (slug: PrologSlug<"course">) =>
+  slugToStyle(slug, themeSlugColourConfigs[theme.value ?? "corporate"]);
 </script>

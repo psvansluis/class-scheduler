@@ -34,7 +34,6 @@ test.describe("Theme selection", () => {
   test("loads the gothic theme from the URL", async ({ page }) => {
     await page.emulateMedia({ colorScheme: "light" });
     await page.goto("./#/result?theme=gothic");
-
     await expect(page.locator("html")).toHaveAttribute("data-theme", "gothic");
   });
 });
