@@ -1,4 +1,4 @@
-import { onMounted, onScopeDispose, ref, type Ref } from "vue";
+import { onMounted, onScopeDispose, readonly, ref, type Ref } from "vue";
 import type { Theme } from "./theme";
 
 const getThemeFromDocument = (): Theme | undefined => {
@@ -6,7 +6,7 @@ const getThemeFromDocument = (): Theme | undefined => {
   return theme ? (theme as Theme) : undefined;
 };
 
-export function getCurrentTheme(): Ref<Theme | undefined> {
+export function getCurrentTheme(): Readonly<Ref<Theme | undefined>> {
   const theme = ref<Theme | undefined>(getThemeFromDocument());
   let observer: MutationObserver | undefined;
 
@@ -21,5 +21,5 @@ export function getCurrentTheme(): Ref<Theme | undefined> {
   });
 
   onScopeDispose(() => observer?.disconnect());
-  return theme;
+  return readonly(theme);
 }
