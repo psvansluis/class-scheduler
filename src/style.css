@@ -7,7 +7,6 @@
 
 :root {
   --serif: "Lora", serif;
-  --heading: "Satisfy", cursive;
   --mono: ui-monospace, Consolas, monospace;
 
   font-family: 18px/145% var(--serif);
@@ -30,6 +29,14 @@
 }
 
 @font-face {
+  font-family: "UncialAntiqua";
+  src: url("./assets/fonts/UncialAntiqua-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
   font-family: "Lora";
   src: url("./assets/fonts/Lora-VariableFont_wght.ttf") format("truetype");
   font-weight: normal;
@@ -40,6 +47,8 @@
 :root,
 [data-theme="corporate"] {
   color-scheme: light;
+  --heading: "Satisfy", cursive;
+  --border-width: 1px;
   --background: #f5f5ff;
   --foreground: #1a1a1a;
   --card: #ffffff;
@@ -66,6 +75,8 @@
 
 [data-theme="gothic"] {
   color-scheme: dark;
+  --heading: "UncialAntiqua", cursive;
+  --border-width: 2px;
   --background: #1a1520;
   --foreground: #c0c0c0;
   --card-foreground: #ffffff;
@@ -93,12 +104,6 @@ body {
   color: var(--foreground);
 }
 
-h1,
-h2,
-h3 {
-  font-family: var(--heading);
-}
-
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -124,7 +129,8 @@ h3 {
   --radius-sm: calc(var(--radius) * 0.5);
   --radius-md: calc(var(--radius) * 0.75);
   --radius-lg: var(--radius);
-  --font-heading: var(--font-sans);
+  --font-heading: var(--heading);
+  --border-width-default: var(--border-width);
 }
 
 @layer base {
@@ -133,5 +139,45 @@ h3 {
   }
   body {
     @apply bg-background text-foreground;
+  }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-heading);
+  }
+}
+
+@layer utilities {
+  .border {
+    border-style: var(--tw-border-style, solid);
+    border-width: var(--border-width, 1px);
+  }
+  .border-t {
+    border-top-style: var(--tw-border-style, solid);
+    border-top-width: var(--border-width, 1px);
+  }
+  .border-b {
+    border-bottom-style: var(--tw-border-style, solid);
+    border-bottom-width: var(--border-width, 1px);
+  }
+  .border-l {
+    border-left-style: var(--tw-border-style, solid);
+    border-left-width: var(--border-width, 1px);
+  }
+  .border-r {
+    border-right-style: var(--tw-border-style, solid);
+    border-right-width: var(--border-width, 1px);
+  }
+  .border-x {
+    border-left-style: var(--tw-border-style, solid);
+    border-right-style: var(--tw-border-style, solid);
+    border-left-width: var(--border-width, 1px);
+    border-right-width: var(--border-width, 1px);
+  }
+  .border-y {
+    border-top-style: var(--tw-border-style, solid);
+    border-bottom-style: var(--tw-border-style, solid);
+    border-top-width: var(--border-width, 1px);
+    border-bottom-width: var(--border-width, 1px);
   }
 }
