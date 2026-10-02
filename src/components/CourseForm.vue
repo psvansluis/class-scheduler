@@ -73,13 +73,9 @@ import { labelToSlug, slugToLabel } from "../functions/slugify";
 import type { CourseProperties } from "../types/form";
 import { Button } from "@/components/ui/button";
 import { PhX } from "@phosphor-icons/vue";
-import {
-  slugToStyle,
-  type SlugColourConfig,
-} from "@/functions/useSlugColour.ts";
+import { slugToStyle } from "@/functions/useSlugColour.ts";
 import { getCurrentTheme } from "../functions/useCurrentTheme";
-import type { Theme } from "@/functions/theme.ts";
-import { colord } from "colord";
+import { getFallbackTheme, themeRegistry } from "@/functions/theme.ts";
 
 type CourseSlug = PrologSlug<"course">;
 
@@ -117,25 +113,9 @@ const commit = () => {
   }
 };
 
-const themeSlugColourConfigs: Record<Theme, SlugColourConfig> = {
-  corporate: {
-    hueMin: 240,
-    hueMax: 290,
-    satMin: 70,
-    satMax: 85,
-    lightnessMin: 85,
-    lightnessMax: 95,
-  },
-  gothic: {
-    hueMin: 240,
-    hueMax: 290,
-    satMin: 20,
-    satMax: 35,
-    lightnessMin: 15,
-    lightnessMax: 25,
-    textOnDark: colord("#c0c0c0"),
-  },
-};
 const courseCardStyle = (slug: PrologSlug<"course">) =>
-  slugToStyle(slug, themeSlugColourConfigs[theme.value ?? "corporate"]);
+  slugToStyle(
+    slug,
+    themeRegistry[theme.value ?? getFallbackTheme()].slugColours.course,
+  );
 </script>

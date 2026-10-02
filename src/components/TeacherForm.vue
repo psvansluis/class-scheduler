@@ -73,10 +73,9 @@ import type { TeacherProperties } from "../types/form";
 import SkillPill from "./SkillPill.vue";
 import { Button } from "@/components/ui/button";
 import { PhX } from "@phosphor-icons/vue";
-import { slugToStyle, type SlugColourConfig } from "../functions/useSlugColour";
+import { slugToStyle } from "../functions/useSlugColour";
 import { getCurrentTheme } from "../functions/useCurrentTheme";
-import type { Theme } from "@/functions/theme.ts";
-import { colord } from "colord";
+import { getFallbackTheme, themeRegistry } from "@/functions/theme.ts";
 
 defineProps<{
   skills: Set<PrologSlug<"skill">>;
@@ -113,25 +112,9 @@ const commit = () => {
 
 const theme = getCurrentTheme();
 
-const themeSlugColourConfigs: Record<Theme, SlugColourConfig> = {
-  corporate: {
-    hueMin: 15,
-    hueMax: 30,
-    satMin: 70,
-    satMax: 85,
-    lightnessMin: 85,
-    lightnessMax: 95,
-  },
-  gothic: {
-    hueMin: 15,
-    hueMax: 30,
-    satMin: 20,
-    satMax: 35,
-    lightnessMin: 15,
-    lightnessMax: 25,
-    textOnDark: colord("#c0c0c0"),
-  },
-};
 const teacherCardStyle = (slug: PrologSlug<"teacher">) =>
-  slugToStyle(slug, themeSlugColourConfigs[theme.value ?? "corporate"]);
+  slugToStyle(
+    slug,
+    themeRegistry[theme.value ?? getFallbackTheme()].slugColours.teacher,
+  );
 </script>

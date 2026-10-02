@@ -27,13 +27,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { themes, type Theme } from "@/functions/theme";
+import { themes, type Theme, getFallbackTheme } from "@/functions/theme";
 
 const route = useRoute();
 const router = useRouter();
-const theme = ref<Theme>("corporate");
-const darkPreference = window.matchMedia("(prefers-color-scheme: dark)");
-const fallbackTheme: Theme = darkPreference.matches ? "gothic" : "corporate";
+const theme = ref<Theme>(getFallbackTheme());
 
 const parseTheme = (value: unknown): Theme | undefined =>
   themes.find((t) => t.value === value)?.value;
@@ -42,7 +40,7 @@ const applyTheme = (value: Theme) =>
   (document.documentElement.dataset.theme = value);
 
 const syncThemeFromUrl = () => {
-  const parsedTheme = parseTheme(route.query.theme) ?? fallbackTheme;
+  const parsedTheme = parseTheme(route.query.theme) ?? getFallbackTheme();
   theme.value = parsedTheme;
   applyTheme(theme.value);
 };
