@@ -1,7 +1,7 @@
 ---
 id: 001
 title: Find a suitable design system and implement it
-status: in-progress # open | in-progress | closed
+status: closed # open | in-progress | closed
 priority: medium # low | medium | high
 assignee:
 labels: [design-system, tailwind, shadcn-vue]
@@ -129,4 +129,4 @@ Priority order (most painful first):
 - [x] Dark mode (`prefers-color-scheme: dark`) still functional after migration
 - [x] No hardcoded colour literals (`white`, `black`, `#ffffff`, `#000000`) remain in scoped component styles
 - [x] Reduced CSS maintenance burden (fewer lines in `style.css`, fewer scoped style blocks)
-- [ ] Maintain capability to import custom colours so that slug-based colour mapping in SkillPill can exist (covered by ticket 004)
+- [x] Maintain capability to import custom colours so that slug-based colour mapping in SkillPill can exist (covered by ticket 004)
