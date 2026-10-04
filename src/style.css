@@ -108,15 +108,15 @@
 [data-theme="sacred"] {
   color-scheme: light;
   --heading: "Silkscreen", monospace;
-  --border-width: 4px;
+  --border-width: 3px;
   --background: #ffffff;
   --foreground: #0302bd;
   --card: #999999;
   --card-foreground: #c9162c;
   --popover: #e5e5e5;
   --popover-foreground: #c9162c;
-  --primary: #a75407;
-  --primary-foreground: #53fcfc;
+  --primary: #53fcfc;
+  --primary-foreground: #010101;
   --secondary: #fcfc54;
   --secondary-foreground: #010101;
   --muted: #f1f5f9;
