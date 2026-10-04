@@ -44,6 +44,14 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: "Silkscreen";
+  src: url("./assets/fonts/Silkscreen-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root,
 [data-theme="corporate"] {
   color-scheme: light;
@@ -95,6 +103,34 @@
   --success: hsl(178, 91%, 45%);
   --error: hsl(333, 95%, 50%);
   --radius: 0.8rem;
+}
+
+[data-theme="sacred"] {
+  color-scheme: light;
+  --heading: "Silkscreen", monospace;
+  --border-width: 4px;
+  --background: #ffffff;
+  --foreground: #0302bd;
+  --card: #999999;
+  --card-foreground: #c9162c;
+  --popover: #e5e5e5;
+  --popover-foreground: #c9162c;
+  --primary: #a75407;
+  --primary-foreground: #53fcfc;
+  --secondary: #fcfc54;
+  --secondary-foreground: #010101;
+  --muted: #f1f5f9;
+  --muted-foreground: #3d4755;
+  --accent: #e504e0;
+  --accent-foreground: #010101;
+  --destructive: #e50004;
+  --destructive-foreground: #ffffff;
+  --border: #050697;
+  --input: #0606cb;
+  --ring: #030368;
+  --success: #399554;
+  --error: #b60554;
+  --radius: 0rem;
 }
 
 body {

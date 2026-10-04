@@ -79,6 +79,37 @@ export const themes = [
       },
     },
   },
+  {
+    label: "Sacred",
+    value: "sacred",
+    colorScheme: "light",
+    slugColours: {
+      skill: {
+        hueMin: 30,
+        hueMax: 60,
+        satMin: 85,
+        satMax: 95,
+        lightnessMin: 85,
+        lightnessMax: 95,
+      },
+      course: {
+        hueMin: 160,
+        hueMax: 200,
+        satMin: 80,
+        satMax: 90,
+        lightnessMin: 80,
+        lightnessMax: 90,
+      },
+      teacher: {
+        hueMin: 340,
+        hueMax: 20,
+        satMin: 80,
+        satMax: 100,
+        lightnessMin: 30,
+        lightnessMax: 50,
+      },
+    },
+  },
 ] as const satisfies ThemeDefinition[];
 
 export type Theme = (typeof themes)[number]["value"];
