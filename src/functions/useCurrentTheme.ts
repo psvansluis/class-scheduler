@@ -6,7 +6,7 @@ const getThemeFromDocument = (): Theme | undefined => {
   return theme ? (theme as Theme) : undefined;
 };
 
-export function getCurrentTheme(): Readonly<Ref<Theme | undefined>> {
+export function useCurrentTheme(): Readonly<Ref<Theme | undefined>> {
   const theme = ref<Theme | undefined>(getThemeFromDocument());
   let observer: MutationObserver | undefined;
 

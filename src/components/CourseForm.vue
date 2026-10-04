@@ -35,7 +35,7 @@
           v-for="[slug, properties] in courses"
           :key="slug"
           class="flex items-center justify-between gap-2 p-2 rounded-md border border-border bg-card text-sm shadow-xs"
-          :style="courseCardStyle(slug)"
+          :style="slugToStyle(slug, 'course')"
         >
           <div class="flex flex-wrap items-center gap-1.5 min-w-0">
             <span class="font-medium">{{ slugToLabel(slug).label }}</span>
@@ -73,9 +73,7 @@ import { labelToSlug, slugToLabel } from "../functions/slugify";
 import type { CourseProperties } from "../types/form";
 import { Button } from "@/components/ui/button";
 import { PhX } from "@phosphor-icons/vue";
-import { slugToStyle } from "@/functions/useSlugColour.ts";
-import { getCurrentTheme } from "../functions/useCurrentTheme";
-import { getFallbackTheme, themeRegistry } from "@/functions/theme.ts";
+import { useSlugStyle } from "@/functions/useSlugStyle.ts";
 
 type CourseSlug = PrologSlug<"course">;
 
@@ -97,7 +95,6 @@ const emit = defineEmits<{
 }>();
 
 const canCommit = computed<boolean>(() => isValidName.value);
-const theme = getCurrentTheme();
 
 const commit = () => {
   if (!canCommit.value) return;
@@ -113,9 +110,5 @@ const commit = () => {
   }
 };
 
-const courseCardStyle = (slug: PrologSlug<"course">) =>
-  slugToStyle(
-    slug,
-    themeRegistry[theme.value ?? getFallbackTheme()].slugColours.course,
-  );
+const slugToStyle = useSlugStyle();
 </script>

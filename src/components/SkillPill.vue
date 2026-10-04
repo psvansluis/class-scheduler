@@ -20,12 +20,10 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { getCurrentTheme } from "../functions/useCurrentTheme";
 import { slugToLabel } from "../functions/slugify";
-import { slugToStyle } from "../functions/useSlugColour";
-import { getFallbackTheme, themeRegistry } from "@/functions/theme";
 import type { PrologSlug } from "../types/slugLabel";
 import { PhTrashSimple } from "@phosphor-icons/vue";
+import { useSlugStyle } from "@/functions/useSlugStyle";
 
 const props = withDefaults(
   defineProps<{
@@ -43,12 +41,7 @@ defineEmits<{
 
 const label = computed(() => slugToLabel(props.slug).label);
 
-const theme = getCurrentTheme();
+const slugToStyle = useSlugStyle();
 
-const pillStyle = computed(() =>
-  slugToStyle(
-    props.slug,
-    themeRegistry[theme.value ?? getFallbackTheme()].slugColours.skill,
-  ),
-);
+const pillStyle = computed(() => slugToStyle(props.slug, "skill"));
 </script>

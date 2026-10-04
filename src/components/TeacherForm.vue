@@ -35,7 +35,7 @@
           v-for="[slug, properties] in teachers"
           :key="slug"
           class="flex items-center justify-between gap-2 p-2 rounded-md border border-border bg-card text-sm shadow-xs"
-          :style="teacherCardStyle(slug)"
+          :style="slugToStyle(slug, 'teacher')"
         >
           <div class="flex flex-wrap items-center gap-1.5 min-w-0">
             <strong class="font-medium">{{ slugToLabel(slug).label }}</strong>
@@ -73,9 +73,7 @@ import type { TeacherProperties } from "../types/form";
 import SkillPill from "./SkillPill.vue";
 import { Button } from "@/components/ui/button";
 import { PhX } from "@phosphor-icons/vue";
-import { slugToStyle } from "../functions/useSlugColour";
-import { getCurrentTheme } from "../functions/useCurrentTheme";
-import { getFallbackTheme, themeRegistry } from "@/functions/theme.ts";
+import { useSlugStyle } from "@/functions/useSlugStyle.ts";
 
 defineProps<{
   skills: Set<PrologSlug<"skill">>;
@@ -110,11 +108,5 @@ const commit = () => {
   }
 };
 
-const theme = getCurrentTheme();
-
-const teacherCardStyle = (slug: PrologSlug<"teacher">) =>
-  slugToStyle(
-    slug,
-    themeRegistry[theme.value ?? getFallbackTheme()].slugColours.teacher,
-  );
+const slugToStyle = useSlugStyle();
 </script>
