@@ -1,10 +1,11 @@
 import { describe, it, expect } from "vitest";
 import { useSlugColour } from "../../src/functions/useSlugColour";
 import { colord } from "colord";
+import type { PrologSlug } from "../../src/types/slugLabel";
 
 describe("useSlugColour (pure)", () => {
   it("returns deterministic colours for the same slug", () => {
-    const slug = "Ϝυψ";
+    const slug = "Ϝυψ" as PrologSlug<"skill">;
     const result1 = useSlugColour(slug);
     const result2 = useSlugColour(slug);
     expect(result1).toStrictEqual(result2);
@@ -17,7 +18,7 @@ describe("useSlugColour (pure)", () => {
     };
 
     const hues = Array.from({ length: 100 }, (_, i) =>
-      useSlugColour(`slug-${i}`, config).bgColour.hue(),
+      useSlugColour(`slug-${i}` as PrologSlug<"skill">, config).bgColour.hue(),
     );
 
     const allInRange = hues.every(
@@ -28,7 +29,7 @@ describe("useSlugColour (pure)", () => {
   });
 
   it("chooses high‑contrast text colour", () => {
-    const { textColour } = useSlugColour("dark-bg", {
+    const { textColour } = useSlugColour("dark-bg" as PrologSlug<"skill">, {
       lightnessMin: 10,
       lightnessMax: 10,
     });

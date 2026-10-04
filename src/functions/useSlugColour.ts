@@ -1,4 +1,4 @@
-import type { PrologSlug } from "@/types/slugLabel";
+import type { PrologSlug } from "../types/slugLabel";
 import { hash } from "./hash";
 import { Colord, colord, extend } from "colord";
 import a11yPlugin from "colord/plugins/a11y";
