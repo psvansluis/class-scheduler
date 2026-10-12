@@ -20,7 +20,7 @@ test.describe("Prolog Integration Engine", () => {
     // --- 2. Add Teacher ---
     const teacherForm = page.locator("#teacher-form");
     await teacherForm.locator("#teacher-name-input input").fill("Mr. Jansen");
-    await teacherForm.locator("#add-teacher-button").click();
+    await teacherForm.locator("#teacher-name-input input").press("Enter");
 
     // Verify card insertion inside scope and add skill inside card
     const teacherCard = teacherForm.locator(".teacher-card");
@@ -37,7 +37,7 @@ test.describe("Prolog Integration Engine", () => {
     await courseForm
       .locator("#course-name-input input")
       .fill("Organic Chemistry 101");
-    await courseForm.locator("#add-course-button").click();
+    await courseForm.locator("#course-name-input button").click();
 
     // Verify card insertion inside scope and add skill inside card
     const courseCard = courseForm.locator(".course-card");

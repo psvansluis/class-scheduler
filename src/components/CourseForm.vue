@@ -13,15 +13,6 @@
       @button-pressed="commit"
     />
 
-    <Button
-      id="add-course-button"
-      :disabled="!canCommit"
-      class="w-full max-w-sm"
-      @click="commit"
-    >
-      Add Course
-    </Button>
-
     <div v-if="courses.size > 0" class="space-y-2 pt-2">
       <h4 class="text-sm font-medium text-muted-foreground">
         Registered Courses
@@ -45,13 +36,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { ref } from "vue";
 import NameInput from "./NameInput.vue";
 import CourseCard from "./CourseCard.vue";
 import type { HumanLabel, PrologSlug } from "../types/slugLabel";
 import { labelToSlug } from "../functions/slugify";
 import type { CourseProperties } from "../types/form";
-import { Button } from "@/components/ui/button";
 
 type CourseSlug = PrologSlug<"course">;
 
@@ -71,10 +61,8 @@ const emit = defineEmits<{
   (e: "removeCourse", slug: CourseSlug): void;
 }>();
 
-const canCommit = computed<boolean>(() => isValidName.value);
-
 const commit = () => {
-  if (!canCommit.value) return;
+  if (!isValidName.value) return;
   try {
     emit("updateCourse", {
       slug: labelToSlug(rawName.value as HumanLabel, "course"),
