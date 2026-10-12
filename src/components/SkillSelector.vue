@@ -1,8 +1,18 @@
 <template>
   <div class="flex flex-col gap-2 max-w-sm">
-    <Select v-model="pendingSelection" @update:modelValue="addSelected">
+    <Select
+      v-model="pendingSelection"
+      :disabled="availableSkills.size === 0"
+      @update:modelValue="addSelected"
+    >
       <SelectTrigger class="w-full">
-        <SelectValue placeholder="Choose a skill…" />
+        <SelectValue
+          :placeholder="
+            availableSkills.size === 0
+              ? 'No skills defined yet'
+              : 'Choose a skill…'
+          "
+        />
       </SelectTrigger>
 
       <SelectContent>
@@ -17,7 +27,10 @@
       </SelectContent>
     </Select>
 
-    <div class="flex flex-wrap gap-1 mt-1 min-h-[2rem]">
+    <div
+      v-if="modelValue.size > 0"
+      class="flex flex-wrap gap-1 mt-1 min-h-[2rem]"
+    >
       <SkillPill
         v-for="slug in modelValue"
         :key="slug"
@@ -55,12 +68,16 @@ const pendingSelection = ref<PrologSlug<"skill"> | null>(null);
 
 const addSelected = () => {
   if (pendingSelection.value) {
-    modelValue.value.add(pendingSelection.value);
+    const next = new Set(modelValue.value);
+    next.add(pendingSelection.value);
+    modelValue.value = next;
     pendingSelection.value = null;
   }
 };
 
 const removeSelected = (slug: PrologSlug<"skill">) => {
-  modelValue.value.delete(slug);
+  const next = new Set(modelValue.value);
+  next.delete(slug);
+  modelValue.value = next;
 };
 </script>

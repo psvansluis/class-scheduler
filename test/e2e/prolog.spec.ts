@@ -20,14 +20,16 @@ test.describe("Prolog Integration Engine", () => {
     // --- 2. Add Teacher ---
     const teacherForm = page.locator("#teacher-form");
     await teacherForm.locator("#teacher-name-input input").fill("Mr. Jansen");
-    await teacherForm.getByRole("combobox").click();
-    await page.getByRole("option", { name: "chemistry" }).click();
     await teacherForm.locator("#add-teacher-button").click();
 
-    // Verify list insertion inside scope
-    const teacherRow = teacherForm.locator("ul li");
+    // Verify card insertion inside scope and add skill inside card
+    const teacherCard = teacherForm.locator(".teacher-card");
+    await expect(teacherCard).toContainText("Mr. Jansen");
+    await teacherCard.getByRole("combobox").click();
+    await page.getByRole("option", { name: "chemistry" }).click();
+
     for await (const text of ["Mr. Jansen", "chemistry"]) {
-      await expect(teacherRow).toContainText(text);
+      await expect(teacherCard).toContainText(text);
     }
 
     // --- 3. Add Course ---

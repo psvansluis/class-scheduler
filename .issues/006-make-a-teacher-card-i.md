@@ -1,7 +1,7 @@
 ---
 id: 006
 title: Make a teacher card in the form input
-status: open # open | in-progress | closed
+status: closed # open | in-progress | closed
 priority: medium # low | medium | high
 assignee:
 labels: []
@@ -20,9 +20,9 @@ Furthermore, the creation of these cards is currently a mess. You need to enter 
 
 ## Acceptance Criteria
 
-- [ ] Submitted teachers in the teacher input component are their own component
-- [ ] The teacher component uses shadcn's card component
-- [ ] slug-based background colouring is in effect
-- [ ] skills are addable and removable in the card
+- [x] Submitted teachers in the teacher input component are their own component
+- [x] The teacher component uses shadcn's card component
+- [x] slug-based background colouring is in effect
+- [x] skills are addable and removable in the card
 - [ ] timeslots are configurable (only if picked up after implementing FE for timeslots: ticket 010)
 - [ ]
