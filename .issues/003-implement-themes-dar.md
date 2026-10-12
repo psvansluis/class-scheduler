@@ -1,7 +1,7 @@
 ---
 id: 003
 title: Implement themes (dark, light, serious, playful)
-status: open # open | in-progress | closed
+status: in-progress # open | in-progress | closed
 priority: medium # low | medium | high
 assignee:
 labels: [themes, design-system]

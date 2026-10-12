@@ -12,6 +12,17 @@ created: 2026-09-14
 
 ## Description
 
+Right now in the input, previously submitted teachers are some sort of big pill.
+
+Let's make this a proper card. The header is the teacher name, and the body is information such as skills, timeslots.
+
+Furthermore, the creation of these cards is currently a mess. You need to enter a name, select skills, and then press enter. Pressing enter too early means adding no skills, and they cannot be added after the fact. Let's streamline this: for creation, only a name is input, and every other property of a teacher happens in his card.
+
 ## Acceptance Criteria
 
+- [ ] Submitted teachers in the teacher input component are their own component
+- [ ] The teacher component uses shadcn's card component
+- [ ] slug-based background colouring is in effect
+- [ ] skills are addable and removable in the card
+- [ ] timeslots are configurable (only if picked up after implementing FE for timeslots: ticket 010)
 - [ ]
