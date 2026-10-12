@@ -1,7 +1,7 @@
 ---
 id: 007
 title: Implement timeslots and schedule generation with CLP(FD)
-status: open # open | in-progress | closed
+status: closed # open | in-progress | closed
 priority: high # low | medium | high
 assignee:
 labels: [domain, solver, clpfd]
@@ -56,11 +56,11 @@ solve_schedule(Schedule) :- ...
 
 ## Acceptance Criteria
 
-- [ ] **CLP(FD) Integration:** `prolog/rules.pl` imports and utilizes `library(clpfd)`.
-- [ ] **Teacher Assignment:** Each course is assigned exactly one teacher possessing the required skills (`can_teach/2`), and that teacher teaches all classes of that course.
-- [ ] **Availability Adherence:** Classes are only scheduled into timeslots explicitly declared in `teacher_available/2`.
-- [ ] **No Double-Booking:** A teacher is never assigned to multiple classes in the same timeslot.
-- [ ] **Successive Slot Constraint:** `course_constraint(Course, successive(A, B))` guarantees `DayB #= DayA` and `PeriodB #= PeriodA + 1`.
-- [ ] **Day Gap Constraint:** `course_constraint(Course, min_day_gap(A, B, Gap))` guarantees `DayB - DayA #>= Gap + 1`.
-- [ ] **Unsatisfiable Detection:** When constraints conflict or insufficient availability exists, `solve_schedule/1` fails cleanly without throwing errors.
-- [ ] **PlUnit Test Suite:** Comprehensive PlUnit tests in `prolog/tests.pl` verifying each hard constraint individually and in combination.
+- [x] **CLP(FD) Integration:** `prolog/rules.pl` imports and utilizes `library(clpfd)`.
+- [x] **Teacher Assignment:** Each course is assigned exactly one teacher possessing the required skills (`can_teach/2`), and that teacher teaches all classes of that course.
+- [x] **Availability Adherence:** Classes are only scheduled into timeslots explicitly declared in `teacher_available/2`.
+- [x] **No Double-Booking:** A teacher is never assigned to multiple classes in the same timeslot.
+- [x] **Successive Slot Constraint:** `course_constraint(Course, successive(A, B))` guarantees `DayB #= DayA` and `PeriodB #= PeriodA + 1`.
+- [x] **Day Gap Constraint:** `course_constraint(Course, min_day_gap(A, B, Gap))` guarantees `DayB - DayA #>= Gap + 1`.
+- [x] **Unsatisfiable Detection:** When constraints conflict or insufficient availability exists, `solve_schedule/1` fails cleanly without throwing errors.
+- [x] **PlUnit Test Suite:** Comprehensive PlUnit tests in `prolog/tests.pl` verifying each hard constraint individually and in combination.
