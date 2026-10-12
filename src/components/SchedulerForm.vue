@@ -30,7 +30,7 @@
         <CourseForm
           :skills="skills"
           :courses="courses"
-          @add-course="addCourse"
+          @update-course="updateCourse"
           @remove-course="removeCourse"
         />
       </div>
@@ -90,7 +90,7 @@ const updateTeacher = (payload: {
 const removeTeacher = (slug: PrologSlug<"teacher">) =>
   teachers.value.delete(slug);
 
-const addCourse = (payload: {
+const updateCourse = (payload: {
   slug: PrologSlug<"course">;
   properties: CourseProperties;
 }) => courses.value.set(payload.slug, payload.properties);

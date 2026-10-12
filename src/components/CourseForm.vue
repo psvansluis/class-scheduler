@@ -13,10 +13,6 @@
       @button-pressed="commit"
     />
 
-    <div class="max-w-sm">
-      <SkillSelector :available-skills="skills" v-model="draftSkills" />
-    </div>
-
     <Button
       id="add-course-button"
       :disabled="!canCommit"
@@ -30,35 +26,20 @@
       <h4 class="text-sm font-medium text-muted-foreground">
         Registered Courses
       </h4>
-      <ul class="space-y-2 max-w-sm">
-        <li
+      <div class="space-y-3 max-w-sm">
+        <CourseCard
           v-for="[slug, properties] in courses"
           :key="slug"
-          class="flex items-center justify-between gap-2 p-2 rounded-md border border-border bg-card text-sm shadow-xs"
-          :style="slugToStyle(slug, 'course')"
-        >
-          <div class="flex flex-wrap items-center gap-1.5 min-w-0">
-            <span class="font-medium">{{ slugToLabel(slug).label }}</span>
-            <span v-if="properties.skills.size > 0" class="text-xs"
-              >requires:</span
-            >
-            <SkillPill
-              v-for="skillSlug in properties.skills"
-              :key="skillSlug"
-              :slug="skillSlug"
-            />
-          </div>
-          <Button
-            variant="ghost"
-            size="icon-xs"
-            class="shrink-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-            :aria-label="`Remove course ${slugToLabel(slug).label}`"
-            @click="$emit('removeCourse', slug)"
-          >
-            <PhX :size="14" weight="bold" />
-          </Button>
-        </li>
-      </ul>
+          :slug="slug"
+          :properties="properties"
+          :available-skills="skills"
+          @remove="$emit('removeCourse', slug)"
+          @update-properties="
+            (updatedProperties) =>
+              $emit('updateCourse', { slug, properties: updatedProperties })
+          "
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -66,14 +47,11 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import NameInput from "./NameInput.vue";
-import SkillSelector from "./SkillSelector.vue";
-import SkillPill from "./SkillPill.vue";
+import CourseCard from "./CourseCard.vue";
 import type { HumanLabel, PrologSlug } from "../types/slugLabel";
-import { labelToSlug, slugToLabel } from "../functions/slugify";
+import { labelToSlug } from "../functions/slugify";
 import type { CourseProperties } from "../types/form";
 import { Button } from "@/components/ui/button";
-import { PhX } from "@phosphor-icons/vue";
-import { useSlugStyle } from "@/functions/useSlugStyle.ts";
 
 type CourseSlug = PrologSlug<"course">;
 
@@ -84,11 +62,10 @@ defineProps<{
 
 const rawName = ref<string>("");
 const isValidName = ref<boolean>(false);
-const draftSkills = ref<Set<PrologSlug<"skill">>>(new Set());
 
 const emit = defineEmits<{
   (
-    e: "addCourse",
+    e: "updateCourse",
     payload: { slug: CourseSlug; properties: CourseProperties },
   ): void;
   (e: "removeCourse", slug: CourseSlug): void;
@@ -99,16 +76,13 @@ const canCommit = computed<boolean>(() => isValidName.value);
 const commit = () => {
   if (!canCommit.value) return;
   try {
-    emit("addCourse", {
+    emit("updateCourse", {
       slug: labelToSlug(rawName.value as HumanLabel, "course"),
-      properties: { skills: new Set(draftSkills.value) },
+      properties: { skills: new Set() },
     });
     rawName.value = "";
-    draftSkills.value.clear();
   } catch (err) {
     console.error(err);
   }
 };
-
-const slugToStyle = useSlugStyle();
 </script>

@@ -37,14 +37,16 @@ test.describe("Prolog Integration Engine", () => {
     await courseForm
       .locator("#course-name-input input")
       .fill("Organic Chemistry 101");
-    await courseForm.getByRole("combobox").click();
-    await page.getByRole("option", { name: "chemistry" }).click();
     await courseForm.locator("#add-course-button").click();
 
-    const courseRow = courseForm.locator("ul li");
+    // Verify card insertion inside scope and add skill inside card
+    const courseCard = courseForm.locator(".course-card");
+    await expect(courseCard).toContainText("Organic Chemistry 101");
+    await courseCard.getByRole("combobox").click();
+    await page.getByRole("option", { name: "chemistry" }).click();
 
     for await (const text of ["Organic Chemistry 101", "chemistry"]) {
-      await expect(courseRow).toContainText(text);
+      await expect(courseCard).toContainText(text);
     }
 
     // --- 4. Submit and Process Prolog Solution ---
