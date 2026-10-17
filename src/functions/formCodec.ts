@@ -1,6 +1,6 @@
 import { Base64 } from "js-base64";
 
-import type { Form } from "../types/form";
+import type { CourseProperties, Form, TeacherProperties } from "../types/form";
 import type { Serializable } from "../types/serializable";
 import type { PrologSlug } from "../types/slugLabel";
 
@@ -25,18 +25,22 @@ export const decodeForm = (hash: string): Form => {
   const decoded = Base64.decode(hash);
   const parsed: Serializable<Form> = JSON.parse(decoded);
   return {
-    skills: new Set(parsed.skills as PrologSlug<"skill">[]),
+    skills: new Set(parsed.skills),
     teachers: new Map(
-      parsed.teachers.map(([slug, props]: [any, any]) => [
-        slug,
-        { skills: new Set(props.skills) },
-      ]),
+      parsed.teachers.map(
+        ([slug, props]: [
+          PrologSlug<"teacher">,
+          Serializable<TeacherProperties>,
+        ]) => [slug, { skills: new Set(props.skills) }],
+      ),
     ),
     courses: new Map(
-      parsed.courses.map(([slug, props]: [any, any]) => [
-        slug,
-        { skills: new Set(props.skills) },
-      ]),
+      parsed.courses.map(
+        ([slug, props]: [
+          PrologSlug<"course">,
+          Serializable<CourseProperties>,
+        ]) => [slug, { skills: new Set(props.skills) }],
+      ),
     ),
   };
 };

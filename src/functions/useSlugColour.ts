@@ -1,4 +1,4 @@
-import type { PrologSlug } from "../types/slugLabel";
+import type { PrologSlug, TypePrefix } from "../types/slugLabel";
 import { hash } from "./hash";
 import { Colord, colord, extend } from "colord";
 import a11yPlugin from "colord/plugins/a11y";
@@ -31,7 +31,7 @@ export interface SlugColourConfig {
  * @returns An object containing `bgColour` (e.g. "hsl(150, 80%, 70%)") and `textColour`.
  */
 export function useSlugColour(
-  slug: PrologSlug<any>,
+  slug: PrologSlug<TypePrefix>,
   config?: SlugColourConfig,
 ): { bgColour: Colord; textColour: Colord } {
   const cfg: Required<SlugColourConfig> = {

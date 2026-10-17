@@ -1,4 +1,4 @@
-import type { PrologSlug } from "@/types/slugLabel";
+import type { PrologSlug, TypePrefix } from "@/types/slugLabel";
 import type { Ref, StyleValue } from "vue";
 import { themes, getFallbackTheme, type Theme } from "./theme";
 import { useCurrentTheme } from "./useCurrentTheme";
@@ -7,7 +7,7 @@ import { useSlugColour } from "./useSlugColour";
 type SlugColourKind = keyof (typeof themes)[number]["slugColours"];
 
 const slugToStyle = (
-  slug: PrologSlug<any>,
+  slug: PrologSlug<TypePrefix>,
   configSelector: SlugColourKind,
   theme: Ref<Theme | undefined>,
 ): StyleValue => {
@@ -25,6 +25,6 @@ const slugToStyle = (
 export function useSlugStyle() {
   const theme = useCurrentTheme();
 
-  return (slug: PrologSlug<any>, kind: SlugColourKind) =>
+  return (slug: PrologSlug<TypePrefix>, kind: SlugColourKind) =>
     slugToStyle(slug, kind, theme);
 }

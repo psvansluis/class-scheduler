@@ -1,5 +1,5 @@
 <template>
-  <router-link v-bind="$attrs" :to="{ name: name, query: $route.query }">
+  <router-link v-bind="$attrs" :to="{ name: props.name, query: $route.query }">
     <slot />
   </router-link>
 </template>

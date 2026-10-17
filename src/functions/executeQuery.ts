@@ -22,7 +22,7 @@ type TypedOrUntypedOpenQuery<T, Q extends string> =
     ? HasVariables<Q>
     : SameSet<QueryVariables<Q>, Extract<keyof T, string>>;
 
-type OpenQueryResult<T extends Record<string, any>, Q extends string> =
+type OpenQueryResult<T extends Record<string, unknown>, Q extends string> =
   Record<string, unknown> extends T ? QueryBindings<Q> : T;
 
 type GetOpenQueryErrorMessage<T, Q extends string> =
@@ -36,16 +36,19 @@ export type OpenQueryString<T, Q extends string> =
     : GetOpenQueryErrorMessage<T, Q>;
 
 export function executeOpenQuery<
-  T extends Record<string, any> = Record<string, unknown>,
+  T extends Record<string, unknown> = Record<string, unknown>,
 >(engine: swipl.SWIPLModule) {
   return async function* <Q extends string>(
     queryString: OpenQueryString<T, Q>,
   ): AsyncGenerator<OpenQueryResult<T, Q>, void, unknown> {
     const query = engine.prolog.query(queryString);
     while (true) {
-      const answer = (await query.next()) as any;
+      const answer = (await query.next()) as {
+        value: OpenQueryResult<T, Q>;
+        done: boolean;
+      } | null;
       if (!answer || !("value" in answer)) return;
-      yield answer.value as OpenQueryResult<T, Q>;
+      yield answer.value;
       if (answer.done === true) return;
     }
   };

@@ -3,7 +3,7 @@
     <Select
       v-model="pendingSelection"
       :disabled="availableSkills.size === 0"
-      @update:modelValue="addSelected"
+      @update:model-value="addSelected"
     >
       <SelectTrigger class="w-full">
         <SelectValue

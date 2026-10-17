@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-defineProps({ title: String });
+defineProps({ title: { type: String, required: true } });
 </script>
 
 <style scoped>

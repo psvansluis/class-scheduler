@@ -71,4 +71,3 @@ const label = computed(() => slugToLabel(props.slug).label);
 const slugToStyle = useSlugStyle();
 const cardStyle = computed(() => slugToStyle(props.slug, "teacher"));
 </script>
-

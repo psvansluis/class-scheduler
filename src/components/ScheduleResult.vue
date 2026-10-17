@@ -63,9 +63,9 @@ onMounted(async () => {
   }
   try {
     await processForm(form, facts.value);
-  } catch (err: any) {
+  } catch (err: Error | unknown) {
     console.error(err);
-    error.value = `Failed to process layout calculations: ${err.message || err}`;
+    error.value = `Failed to process layout calculations: ${err instanceof Error ? err.message : err}`;
   } finally {
     loading.value = false;
   }

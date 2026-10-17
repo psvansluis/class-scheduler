@@ -13,12 +13,11 @@ const readFile = (fileName: string): string =>
 
 /** Execute a Prolog query and return the result object. */
 async function executeQuery(
-  engine: any,
+  engine: swipl.SWIPLModule,
   queryString: string,
 ): Promise<{ success: boolean }> {
   const query = await engine.prolog.query(queryString);
-  const result = await query.once();
-  await query.close();
+  const result = (await query.once()) as { success: boolean };
   return result;
 }
 

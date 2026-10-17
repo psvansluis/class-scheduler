@@ -3,6 +3,7 @@ import vue from "@vitejs/plugin-vue";
 import fs from "fs";
 import path from "path";
 import tailwindcss from "@tailwindcss/vite";
+import type { IncomingMessage, ServerResponse } from "http";
 
 // --- CONFIGURATION MANAGEMENT ---
 const resolvePath = (p: string) => path.resolve(__dirname, p);
@@ -26,13 +27,13 @@ const PROLOG_ASSET_MANIFEST: AssetMap[] = [
 ];
 
 const serveStaticFile = (
-  res: any,
+  response: ServerResponse<IncomingMessage>,
   filePath: string,
   contentType: string,
 ): boolean => {
   if (fs.existsSync(filePath)) {
-    res.setHeader("Content-Type", contentType);
-    res.end(fs.readFileSync(filePath));
+    response.setHeader("Content-Type", contentType);
+    response.end(fs.readFileSync(filePath));
     return true;
   }
   return false;
