@@ -1,7 +1,7 @@
 ---
 id: 010
 title: Implement frontend inputs for timeslots and course requirements
-status: open # open | in-progress | closed
+status: closed # open | in-progress | closed
 priority: medium # low | medium | high
 assignee:
 labels: [frontend, vue, ux]
@@ -44,9 +44,9 @@ Ticket 007 introduces timeslot-based schedule generation in the Prolog engine. T
 
 ## Acceptance Criteria
 
-- [ ] `TeacherProperties` and `CourseProperties` updated in `src/types/form.d.ts`.
-- [ ] `encodeForm` and `decodeForm` preserve teacher availability and course constraints in the URL without breaking existing URLs.
-- [ ] Teacher form / card provides an interactive 5x8 grid to toggle available timeslots with preset helpers.
-- [ ] Course form / card allows entering class count and selecting spacing/block constraints.
-- [ ] `mapFormToFacts` in `src/functions/processForm.ts` generates valid CLP(FD) facts matching the Ticket 007 specification (`teacher_available/2`, `course_classes/2`, and `course_constraint/2`).
-- [ ] Unit tests verify form codec encoding/decoding and fact mapping for availability slots and course requirements.
+- [x] `TeacherProperties` and `CourseProperties` updated in `src/types/form.d.ts`.
+- [x] `encodeForm` and `decodeForm` preserve teacher availability and course constraints in the URL without breaking existing URLs.
+- [x] Teacher form / card provides an interactive 5x8 grid to toggle available timeslots with preset helpers.
+- [x] Course form / card allows entering class count and selecting spacing/block constraints.
+- [x] `mapFormToFacts` in `src/functions/processForm.ts` generates valid CLP(FD) facts matching the Ticket 007 specification (`teacher_available/2`, `course_classes/2`, and `course_constraint/2`).
+- [x] Unit tests verify form codec encoding/decoding and fact mapping for availability slots and course requirements.

@@ -1,9 +1,10 @@
-import type { Form } from "../types/form.d.ts";
+import type { CourseConstraint, Form } from "../types/form.d.ts";
 import type { PrologSlug } from "../types/slugLabel";
 
 import { executeOpenQuery, executeClosedQuery } from "./executeQuery";
 import swipl from "swipl-wasm";
 import { slugToLabel } from "./slugify.ts";
+import { parseSlotId } from "./timeslots";
 
 const base = import.meta.env.BASE_URL;
 
@@ -37,17 +38,75 @@ const getRules = async (): Promise<string> => {
   return await response.text();
 };
 
-const mapFormToFacts = (form: Form): string => {
-  // const skillFacts = Array.from(form.skills).map((skill) => `skill(${skill}).`);
-  const teacherFacts = Array.from(form.teachers).flatMap(([slug, props]) =>
-    Array.from(props.skills).map(
-      (skill) => `teacher_skill('${slug}', '${skill}').`,
-    ),
+const mapConstraintToFacts = (
+  slug: PrologSlug<"course">,
+  classCount: number,
+  c: CourseConstraint,
+): string[] => {
+  switch (c.type) {
+    case "double-block":
+      return classCount >= 2
+        ? [`course_constraint('${slug}', successive(1, 2)).`]
+        : [];
+    case "spread-days":
+      return Array.from(
+        { length: Math.max(0, classCount - 1) },
+        (_, index) =>
+          `course_constraint('${slug}', min_day_gap(${index + 1}, ${index + 2}, ${c.minGap ?? 0})).`,
+      );
+    case "successive":
+      return [
+        `course_constraint('${slug}', successive(${c.classA}, ${c.classB})).`,
+      ];
+    case "min_day_gap":
+      return [
+        `course_constraint('${slug}', min_day_gap(${c.classA}, ${c.classB}, ${c.gap})).`,
+      ];
+    default:
+      return [];
+  }
+};
+
+export const mapFormToFacts = (form: Form): string => {
+  const teacherSkillFacts = Array.from(form.teachers).flatMap(
+    ([slug, { skills }]) =>
+      Array.from(skills).map(
+        (skill) => `teacher_skill('${slug}', '${skill}').`,
+      ),
   );
-  const courseFacts = Array.from(form.courses).flatMap(([slug, props]) =>
-    Array.from(props.skills).map(
-      (skill) => `course_requires('${slug}', '${skill}').`,
-    ),
+
+  const teacherAvailabilityFacts = Array.from(form.teachers).flatMap(
+    ([slug, { availableSlots }]) =>
+      Array.from(availableSlots).map((slotId) => {
+        const { dayNumber, period } = parseSlotId(slotId);
+        return `teacher_available('${slug}', slot(${dayNumber}, ${period})).`;
+      }),
   );
-  return [...teacherFacts, ...courseFacts].join("\n");
+
+  const courseRequiresFacts = Array.from(form.courses).flatMap(
+    ([slug, { skills }]) =>
+      Array.from(skills).map(
+        (skill) => `course_requires('${slug}', '${skill}').`,
+      ),
+  );
+
+  const courseClassFacts = Array.from(form.courses).map(
+    ([slug, { classCount }]) =>
+      `course_classes('${slug}', ${classCount ?? 1}).`,
+  );
+
+  const courseConstraintFacts = Array.from(form.courses).flatMap(
+    ([slug, { classCount, constraints }]) =>
+      (constraints ?? []).flatMap((c) =>
+        mapConstraintToFacts(slug, classCount, c),
+      ),
+  );
+
+  return [
+    ...teacherSkillFacts,
+    ...teacherAvailabilityFacts,
+    ...courseRequiresFacts,
+    ...courseClassFacts,
+    ...courseConstraintFacts,
+  ].join("\n");
 };
