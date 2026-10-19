@@ -110,16 +110,21 @@ const dragTargetValue = ref(false);
 const isSelected = (day: TimeslotDay, period: TimeslotPeriod): boolean =>
   props.modelValue.has(formatSlotId(day, period));
 
+const setSlotSelected = (
+  day: TimeslotDay,
+  period: TimeslotPeriod,
+  selected: boolean,
+) => {
+  const next = new Set(props.modelValue);
+  const slotId = formatSlotId(day, period);
+  const action = selected ? "add" : "delete";
+  next[action](slotId);
+  emit("update:modelValue", next);
+};
+
 const toggleSlot = (day: TimeslotDay, period: TimeslotPeriod) => {
   if (props.disabled) return;
-  const slotId = formatSlotId(day, period);
-  const next = new Set(props.modelValue);
-  if (next.has(slotId)) {
-    next.delete(slotId);
-  } else {
-    next.add(slotId);
-  }
-  emit("update:modelValue", next);
+  setSlotSelected(day, period, !isSelected(day, period));
 };
 
 const onMouseDown = (
@@ -129,32 +134,14 @@ const onMouseDown = (
 ) => {
   if (props.disabled || event.button !== 0) return;
   isDragging.value = true;
-  const currentlySelected = isSelected(day, period);
-  dragTargetValue.value = !currentlySelected;
-
-  const slotId = formatSlotId(day, period);
-  const next = new Set(props.modelValue);
-  if (dragTargetValue.value) {
-    next.add(slotId);
-  } else {
-    next.delete(slotId);
-  }
-  emit("update:modelValue", next);
+  dragTargetValue.value = !isSelected(day, period);
+  setSlotSelected(day, period, dragTargetValue.value);
 };
 
 const onMouseEnter = (day: TimeslotDay, period: TimeslotPeriod) => {
   if (!isDragging.value || props.disabled) return;
-  const slotId = formatSlotId(day, period);
-  const currentlySelected = props.modelValue.has(slotId);
-  if (currentlySelected !== dragTargetValue.value) {
-    const next = new Set(props.modelValue);
-    if (dragTargetValue.value) {
-      next.add(slotId);
-    } else {
-      next.delete(slotId);
-    }
-    emit("update:modelValue", next);
-  }
+  if (isSelected(day, period) === dragTargetValue.value) return;
+  setSlotSelected(day, period, dragTargetValue.value);
 };
 
 const onGlobalMouseUp = () => (isDragging.value = false);
@@ -164,11 +151,7 @@ const applyPreset = (preset: SlotPreset) => {
   emit("update:modelValue", PRESET_SLOTS[preset].values);
 };
 
-onMounted(() => {
-  window.addEventListener("mouseup", onGlobalMouseUp);
-});
+onMounted(() => window.addEventListener("mouseup", onGlobalMouseUp));
 
-onUnmounted(() => {
-  window.removeEventListener("mouseup", onGlobalMouseUp);
-});
+onUnmounted(() => window.removeEventListener("mouseup", onGlobalMouseUp));
 </script>

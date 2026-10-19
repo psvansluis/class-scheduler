@@ -1,6 +1,6 @@
 <template>
   <Card
-    class="teacher-card py-4 gap-3 shadow-xs border-border"
+    class="teacher-card py-4 gap-3 rounded-lg shadow-xs border-border"
     :style="cardStyle"
   >
     <CardHeader class="px-4 py-0">
@@ -94,16 +94,13 @@ const emit = defineEmits<{
 
 const isGridOpen = ref(true);
 
-const slots = computed(
-  () => props.properties.availableSlots ?? new Set<TimeslotId>(),
-);
+const slots = computed(() => props.properties.availableSlots);
 const slotCount = computed(() => slots.value.size);
 
 const onUpdateSkills = (skills: Set<PrologSlug<"skill">>) => {
   emit("updateProperties", {
     ...props.properties,
     skills,
-    availableSlots: slots.value,
   });
 };
 

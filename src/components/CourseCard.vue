@@ -1,6 +1,6 @@
 <template>
   <Card
-    class="course-card py-4 gap-3 shadow-xs border-border"
+    class="course-card py-4 gap-3 rounded-lg shadow-xs border-border"
     :style="cardStyle"
   >
     <CardHeader class="px-4 py-0">
@@ -76,40 +76,24 @@
           </span>
         </div>
         <div class="grid grid-cols-1 gap-1.5 pt-0.5">
-          <button
+          <Button
+            v-for="constraint in constraintButtons"
+            :key="constraint.type"
             type="button"
-            :disabled="classCount < 2"
+            :disabled="constraint.disabled"
             :class="[
               'flex items-center justify-between rounded-md border px-2.5 py-1.5 text-xs text-left transition-colors cursor-pointer',
-              isDoubleBlock
+              constraint.isActive
                 ? 'bg-primary/10 border-primary text-foreground font-medium'
                 : 'bg-background hover:bg-muted/50 border-border/60 text-muted-foreground',
-              classCount < 2
-                ? 'opacity-40 cursor-not-allowed pointer-events-none'
-                : '',
             ]"
-            @click="toggleConstraint('double-block')"
+            @click="toggleConstraint(constraint.type)"
           >
-            <span>Schedule as double-block</span>
-            <span v-if="isDoubleBlock" class="text-primary font-bold">✓</span>
-          </button>
-          <button
-            type="button"
-            :disabled="classCount < 2"
-            :class="[
-              'flex items-center justify-between rounded-md border px-2.5 py-1.5 text-xs text-left transition-colors cursor-pointer',
-              isSpreadDays
-                ? 'bg-primary/10 border-primary text-foreground font-medium'
-                : 'bg-background hover:bg-muted/50 border-border/60 text-muted-foreground',
-              classCount < 2
-                ? 'opacity-40 cursor-not-allowed pointer-events-none'
-                : '',
-            ]"
-            @click="toggleConstraint('spread-days')"
-          >
-            <span>Spread over different days</span>
-            <span v-if="isSpreadDays" class="text-primary font-bold">✓</span>
-          </button>
+            <span>{{ constraint.label }}</span>
+            <span v-if="constraint.isActive" class="text-foreground font-bold"
+              >✓</span
+            >
+          </Button>
         </div>
       </div>
     </CardContent>
@@ -117,7 +101,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, type ComputedRef } from "vue";
 import { slugToLabel } from "../functions/slugify";
 import type { PrologSlug } from "../types/slugLabel";
 import type { CourseConstraint, CourseProperties } from "../types/form";
@@ -154,6 +138,29 @@ const isDoubleBlock = computed(() =>
 const isSpreadDays = computed(() =>
   constraints.value.some((c) => c.type === "spread-days"),
 );
+
+const constraintButtons: ComputedRef<
+  {
+    type: "double-block" | "spread-days";
+    label: string;
+    isActive: boolean;
+    disabled: boolean;
+  }[]
+> = computed(() => [
+  {
+    type: "double-block",
+    label: "Schedule as double-block",
+    isActive: isDoubleBlock.value,
+    disabled: classCount.value < 2,
+  },
+  {
+    type: "spread-days",
+    label: "Spread over different days",
+    description: "Requires 2+ classes",
+    isActive: isSpreadDays.value,
+    disabled: classCount.value < 2,
+  },
+]);
 
 const onUpdateSkills = (skills: Set<PrologSlug<"skill">>) => {
   emit("updateProperties", {
