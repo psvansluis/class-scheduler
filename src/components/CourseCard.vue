@@ -22,8 +22,13 @@
     <CardContent class="px-4 space-y-3">
       <!-- Required Skills -->
       <div class="space-y-1.5">
-        <span class="text-xs font-medium opacity-80">Required Skills</span>
+        <Label
+          for="course-skill-selector"
+          class="text-xs font-medium opacity-80"
+          >Required Skills</Label
+        >
         <SkillSelector
+          id="course-skill-selector"
           :available-skills="availableSkills"
           :model-value="properties.skills"
           @update:model-value="onUpdateSkills"
@@ -33,34 +38,35 @@
       <!-- Classes per week stepper -->
       <div class="space-y-1.5 pt-1 border-t border-border/40">
         <div class="flex items-center justify-between">
-          <span class="text-xs font-medium opacity-80">Classes / Week</span>
-          <div class="flex items-center gap-1.5">
-            <Button
-              type="button"
-              variant="outline"
-              size="icon-xs"
-              class="h-6 w-6"
-              :disabled="classCount <= 1"
-              aria-label="Decrease class count"
-              @click="updateClassCount(-1)"
+          <NumberField
+            id="course-class-count-field"
+            :model-value="classCount"
+            :min="1"
+            :max="10"
+            :step="1"
+            :format-options="{ maximumFractionDigits: 0 }"
+            class="w-[7.5rem]"
+            @update:model-value="updateClassCount"
+          >
+            <Label
+              class="text-xs font-medium opacity-80"
+              for="course-class-count-field"
             >
-              <PhMinus :size="12" />
-            </Button>
-            <span class="w-5 text-center font-mono text-xs font-semibold">
-              {{ classCount }}
-            </span>
-            <Button
-              type="button"
-              variant="outline"
-              size="icon-xs"
-              class="h-6 w-6"
-              :disabled="classCount >= 10"
-              aria-label="Increase class count"
-              @click="updateClassCount(1)"
-            >
-              <PhPlus :size="12" />
-            </Button>
-          </div>
+              Classes / Week
+            </Label>
+            <NumberFieldContent>
+              <NumberFieldDecrement aria-label="Decrease classes per week">
+                <PhMinus :size="12" />
+              </NumberFieldDecrement>
+              <NumberFieldInput
+                aria-label="Classes per week"
+                class="h-7 border-0 px-7 font-mono text-xs font-semibold shadow-none focus-visible:ring-0"
+              />
+              <NumberFieldIncrement aria-label="Increase classes per week">
+                <PhPlus :size="12" />
+              </NumberFieldIncrement>
+            </NumberFieldContent>
+          </NumberField>
         </div>
       </div>
 
@@ -113,8 +119,17 @@ import {
   CardAction,
   CardContent,
 } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import {
+  NumberField,
+  NumberFieldContent,
+  NumberFieldDecrement,
+  NumberFieldIncrement,
+  NumberFieldInput,
+} from "@/components/ui/number-field";
 import { PhX, PhPlus, PhMinus } from "@phosphor-icons/vue";
+
 import SkillSelector from "./SkillSelector.vue";
 
 const props = defineProps<{
@@ -171,8 +186,8 @@ const onUpdateSkills = (skills: Set<PrologSlug<"skill">>) => {
   });
 };
 
-const updateClassCount = (delta: number) => {
-  const newCount = Math.max(1, Math.min(10, classCount.value + delta));
+const updateClassCount = (newCount: number | undefined) => {
+  if (newCount === undefined) return;
   let updatedConstraints = constraints.value;
   if (newCount < 2) {
     updatedConstraints = [];
