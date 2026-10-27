@@ -43,6 +43,10 @@ test(single_class_scheduled, [true(Schedule==[class(algebra, 1, mr_jansen, slot(
 	given([teacher_skill(mr_jansen, math), course_requires(algebra, math), course_classes(algebra, 1), teacher_available(mr_jansen, slot(1, 1))]),
 	solve_schedule(Schedule).
 
+test(single_class_exported_as_flat_row, [true(Rows==[[algebra, 1, mr_jansen, 1, 1]])]) :-
+	given([teacher_skill(mr_jansen, math), course_requires(algebra, math), course_classes(algebra, 1), teacher_available(mr_jansen, slot(1, 1))]),
+	solve_schedule_rows(Rows).
+
 test(teacher_assigned_to_all_course_classes, [true(Teachers==[mr_jansen, mr_jansen]), nondet]) :-
 	given([teacher_skill(mr_jansen, math), course_requires(algebra, math), course_classes(algebra, 2), teacher_available(mr_jansen, slot(1, 1)), teacher_available(mr_jansen, slot(1, 2))]),
 	solve_schedule(Schedule),

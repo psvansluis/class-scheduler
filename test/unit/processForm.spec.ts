@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { mapFormToFacts } from "../../src/functions/processForm";
-import { parseSchedule } from "../../src/functions/parseSchedule";
+import { mapScheduleRows } from "../../src/functions/scheduleRows";
 import type { Form } from "../../src/types/form";
 import type { PrologSlug } from "../../src/types/slugLabel";
 
@@ -90,27 +90,19 @@ describe("mapFormToFacts", () => {
   });
 });
 
-describe("parseSchedule", () => {
-  it("parses swipl-wasm style term objects", () => {
-    const raw = [
-      {
-        $t: "t",
-        class: [
-          [
-            "course__Y2hlbWlzdHJ5IDEwMQ",
-            1,
-            "teacher__bXIgamFuc2Vu",
-            {
-              $t: "t",
-              slot: [[1, 5]],
-            },
-          ],
+describe("mapScheduleRows", () => {
+  it("maps flattened Prolog rows into scheduled classes", () => {
+    expect(
+      mapScheduleRows([
+        [
+          "course__Y2hlbWlzdHJ5IDEwMQ" as PrologSlug<"course">,
+          1,
+          "teacher__bXIgamFuc2Vu" as PrologSlug<"teacher">,
+          1,
+          5,
         ],
-      },
-    ];
-
-    const result = parseSchedule(raw);
-    expect(result).toEqual([
+      ]),
+    ).toEqual([
       {
         course: "course__Y2hlbWlzdHJ5IDEwMQ",
         classIndex: 1,
@@ -119,43 +111,5 @@ describe("parseSchedule", () => {
         period: 5,
       },
     ]);
-  });
-
-  it("parses swipl-wasm runtime PrologCompound objects containing functor property", () => {
-    const raw = [
-      {
-        $t: "t",
-        functor: "class",
-        class: [
-          [
-            "course__Y2hlbWlzdHJ5IDEwMQ",
-            2,
-            "teacher__bXIgamFuc2Vu",
-            {
-              $t: "t",
-              functor: "slot",
-              slot: [[2, 6]],
-            },
-          ],
-        ],
-      },
-    ];
-
-    const result = parseSchedule(raw);
-    expect(result).toEqual([
-      {
-        course: "course__Y2hlbWlzdHJ5IDEwMQ",
-        classIndex: 2,
-        teacher: "teacher__bXIgamFuc2Vu",
-        day: 2,
-        period: 6,
-      },
-    ]);
-  });
-
-  it("returns empty array for non-array inputs", () => {
-    expect(parseSchedule(null)).toEqual([]);
-    expect(parseSchedule(undefined)).toEqual([]);
-    expect(parseSchedule("foo")).toEqual([]);
   });
 });

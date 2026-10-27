@@ -1,11 +1,11 @@
 import type { CourseConstraint, Form } from "../types/form.d.ts";
-import type { ScheduledClass } from "../types/schedule.js";
+import type { ScheduleRow, ScheduledClass } from "../types/schedule.d.ts";
 import type { PrologSlug } from "../types/slugLabel";
 
 import { executeOpenQuery, executeClosedQuery } from "./executeQuery";
 import swipl from "swipl-wasm";
 import { parseSlotId } from "./timeslots";
-import { parseSchedule } from "./parseSchedule.ts";
+import { mapScheduleRows } from "./scheduleRows";
 
 const base = import.meta.env?.BASE_URL ?? "/";
 
@@ -19,10 +19,10 @@ export const processForm = async (form: Form): Promise<ScheduledClass[]> => {
   swi.FS.writeFile("/rules.pl", rulesAndFacts);
   await executeClosedQuery(swi, "consult('/rules.pl').");
 
-  // solve_schedule/1 unifies Schedule with the first valid timetable.
+  // solve_schedule_rows/1 unifies Schedule with the first timetable as rows.
   // An empty return list models the unsatisfiable case.
-  const gen = executeOpenQuery<{ Schedule: unknown }>(swi)(
-    "solve_schedule(Schedule).",
+  const gen = executeOpenQuery<{ Schedule: ScheduleRow[] }>(swi)(
+    "solve_schedule_rows(Schedule).",
   );
   const result = await gen.next();
 
@@ -30,7 +30,7 @@ export const processForm = async (form: Form): Promise<ScheduledClass[]> => {
     return [];
   }
 
-  return parseSchedule(result.value.Schedule);
+  return mapScheduleRows(result.value.Schedule);
 };
 
 const getRules = async (): Promise<string> => {

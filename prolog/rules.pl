@@ -22,6 +22,15 @@ solve_schedule(Schedule) :-
 	extract_vars(ClassSlots, Vars),
 	labeling([ff], Vars).
 
+% solve_schedule_rows(-Rows)
+% Exports each scheduled class as a flat list for the JavaScript boundary.
+solve_schedule_rows(Rows) :-
+	solve_schedule(Schedule),
+	maplist(class_row, Schedule, Rows).
+
+class_row(class(Course, Index, Teacher, slot(Day, Period)),
+	[Course, Index, Teacher, Day, Period]).
+
 % Collect all unique courses and class counts from course_classes/2 facts.
 collect_courses(Courses) :-
 	findall(Course - Count,

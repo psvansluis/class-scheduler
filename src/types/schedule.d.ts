@@ -8,3 +8,11 @@ export interface ScheduledClass {
   day: 1 | 2 | 3 | 4 | 5; // 1–5 (Mon–Fri)
   period: (typeof PERIODS)[number]; // 1–8
 }
+
+export type ScheduleRow = [
+  PrologSlug<"course">,
+  number,
+  PrologSlug<"teacher">,
+  ScheduledClass["day"],
+  ScheduledClass["period"],
+];
