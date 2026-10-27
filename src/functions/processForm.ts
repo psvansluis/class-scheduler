@@ -1,17 +1,15 @@
 import type { CourseConstraint, Form } from "../types/form.d.ts";
+import type { ScheduledClass } from "../types/schedule.js";
 import type { PrologSlug } from "../types/slugLabel";
 
 import { executeOpenQuery, executeClosedQuery } from "./executeQuery";
 import swipl from "swipl-wasm";
-import { slugToLabel } from "./slugify.ts";
 import { parseSlotId } from "./timeslots";
+import { parseSchedule } from "./parseSchedule.ts";
 
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env?.BASE_URL ?? "/";
 
-export const processForm = async (
-  form: Form,
-  factReceiver: string[],
-): Promise<void> => {
+export const processForm = async (form: Form): Promise<ScheduledClass[]> => {
   const rules = await getRules();
   const facts = mapFormToFacts(form);
 
@@ -21,14 +19,18 @@ export const processForm = async (
   swi.FS.writeFile("/rules.pl", rulesAndFacts);
   await executeClosedQuery(swi, "consult('/rules.pl').");
 
-  for await (const { Teacher, Course } of executeOpenQuery<{
-    Teacher: PrologSlug<"teacher">;
-    Course: PrologSlug<"course">;
-  }>(swi)("can_teach(Teacher, Course).")) {
-    factReceiver.push(
-      `Teacher ${slugToLabel(Teacher).label} can teach ${slugToLabel(Course).label}`,
-    );
+  // solve_schedule/1 unifies Schedule with the first valid timetable.
+  // An empty return list models the unsatisfiable case.
+  const gen = executeOpenQuery<{ Schedule: unknown }>(swi)(
+    "solve_schedule(Schedule).",
+  );
+  const result = await gen.next();
+
+  if (result.done || !result.value) {
+    return [];
   }
+
+  return parseSchedule(result.value.Schedule);
 };
 
 const getRules = async (): Promise<string> => {

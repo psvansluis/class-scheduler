@@ -1,7 +1,7 @@
 ---
 id: 012
 title: Implement timetable grid and schedule display
-status: open # open | in-progress | closed
+status: closed # open | in-progress | closed
 priority: medium # low | medium | high
 assignee:
 labels: [frontend, vue, ux, solver]
@@ -58,8 +58,8 @@ With Ticket 007 defining the CLP(FD) solver rules and Ticket 010 providing the t
 
 ## Acceptance Criteria
 
-- [ ] `processForm.ts` executes `solve_schedule/1` against SWI-Prolog and parses `class/4` terms into structured timetable objects.
-- [ ] `ScheduleResult.vue` displays a 5-day $\times$ 8-period timetable grid.
-- [ ] Scheduled class items display the course, assigned teacher with distinct slug styling, and skill badges.
-- [ ] Unsatisfiable schedules show a clear, user-friendly alert explaining that no conflict-free timetable exists.
-- [ ] Navigation back to the form retains all user inputs.
+- [x] `processForm.ts` executes `solve_schedule/1` against SWI-Prolog and parses `class/4` terms into structured timetable objects.
+- [x] `ScheduleResult.vue` displays a 5-day $\times$ 8-period timetable grid.
+- [x] Scheduled class items display the course, assigned teacher with distinct slug styling, and skill badges.
+- [x] Unsatisfiable schedules show a clear, user-friendly alert explaining that no conflict-free timetable exists.
+- [x] Navigation back to the form retains all user inputs.
