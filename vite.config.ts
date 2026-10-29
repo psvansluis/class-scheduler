@@ -21,7 +21,11 @@ const PROLOG_ASSET_MANIFEST: AssetMap[] = [
     virtualRoute: "/prolog/",
     srcDir: resolvePath("prolog"),
     distDir: resolvePath("dist/prolog"),
-    files: ["rules.pl"],
+    files: [
+      "rules.pl",
+      "domain/scheduler_domain.pl",
+      "adapters/schedule_io.pl",
+    ],
     contentType: "text/plain",
   },
 ];
@@ -40,8 +44,9 @@ const serveStaticFile = (
 };
 
 const copySingleAsset = (srcDir: string, destDir: string, file: string) => {
-  fs.mkdirSync(destDir, { recursive: true });
-  fs.copyFileSync(path.join(srcDir, file), path.join(destDir, file));
+  const targetPath = path.join(destDir, file);
+  fs.mkdirSync(path.dirname(targetPath), { recursive: true });
+  fs.copyFileSync(path.join(srcDir, file), targetPath);
 };
 
 export default defineConfig({
@@ -56,19 +61,26 @@ export default defineConfig({
         server.middlewares.use((req, res, next) => {
           if (!req.url) return next();
 
-          const fileName = req.url.split("/").pop()?.split("?")[0] || "";
+          const matched = PROLOG_ASSET_MANIFEST.find((asset) => {
+            const routeIndex = req.url!.indexOf(asset.virtualRoute);
+            if (routeIndex < 0) return false;
+            const relativePath = req
+              .url!.slice(routeIndex + asset.virtualRoute.length)
+              .split("?")[0];
+            return asset.files.includes(relativePath);
+          });
 
-          const matched = PROLOG_ASSET_MANIFEST.find(
-            (asset) =>
-              req.url!.includes(asset.virtualRoute) &&
-              asset.files.includes(fileName),
-          );
+          if (!matched) return next();
+
+          const routeIndex = req.url.indexOf(matched.virtualRoute);
+          const relativePath = req.url
+            .slice(routeIndex + matched.virtualRoute.length)
+            .split("?")[0];
 
           if (
-            matched &&
             serveStaticFile(
               res,
-              path.join(matched.srcDir, fileName),
+              path.join(matched.srcDir, relativePath),
               matched.contentType,
             )
           ) {

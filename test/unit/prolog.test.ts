@@ -23,16 +23,27 @@ async function executeQuery(
 
 /** Run the Prolog test suite and return true if all PlUnit tests pass. */
 export async function runPrologTests(): Promise<boolean> {
-  const coreRulesText = readFile("rules.pl");
-  const testManifestText = readFile("tests.pl");
-  const testSuite = `${coreRulesText}\n\n${testManifestText}`;
-
   const swi = await swipl();
-  swi.FS.writeFile("/test_suite.pl", testSuite);
-  await executeQuery(swi, "consult('/test_suite.pl').");
+  swi.FS.mkdir("/prolog");
+  swi.FS.mkdir("/prolog/domain");
+  swi.FS.mkdir("/prolog/adapters");
+  swi.FS.mkdir("/prolog/tests");
+  for (const file of [
+    "rules.pl",
+    "domain/scheduler_domain.pl",
+    "adapters/schedule_io.pl",
+    "tests/domain_tests.pl",
+    "tests/boundary_tests.pl",
+  ]) {
+    swi.FS.writeFile(`/prolog/${file}`, readFile(file));
+  }
 
-  const testExecution = await executeQuery(swi, "run_tests.");
-  return testExecution.success;
+  await executeQuery(swi, "consult('/prolog/tests/domain_tests.pl').");
+  await executeQuery(swi, "consult('/prolog/tests/boundary_tests.pl').");
+
+  const domainTests = await executeQuery(swi, "run_tests(domain_tests).");
+  const boundaryTests = await executeQuery(swi, "run_tests(boundary_tests).");
+  return domainTests.success && boundaryTests.success;
 }
 
 // Vitest integration

@@ -1,28 +1,39 @@
-import type { CourseConstraint, Form } from "../types/form.d.ts";
+import type { Form } from "../types/form.d.ts";
 import type { ScheduleRow, ScheduledClass } from "../types/schedule.d.ts";
-import type { PrologSlug } from "../types/slugLabel";
 
-import { executeOpenQuery, executeClosedQuery } from "./executeQuery";
+import {
+  executeOpenQuery,
+  executeClosedQuery,
+  executeBoundQuery,
+} from "./executeQuery";
 import swipl from "swipl-wasm";
-import { parseSlotId } from "./timeslots";
 import { mapScheduleRows } from "./scheduleRows";
+import { mapFormToRows } from "./formRows";
 
 const base = import.meta.env?.BASE_URL ?? "/";
+const PROLOG_FILES = [
+  { path: ["prolog"], file: "rules.pl" },
+  { path: ["prolog", "domain"], file: "scheduler_domain.pl" },
+  { path: ["prolog", "adapters"], file: "schedule_io.pl" },
+] as const;
+const PROLOG_ENTRYPOINT = PROLOG_FILES[0];
 
 export const processForm = async (form: Form): Promise<ScheduledClass[]> => {
-  const rules = await getRules();
-  const facts = mapFormToFacts(form);
-
-  const rulesAndFacts = rules + "\n\n" + facts;
-
   const swi = await swipl();
-  swi.FS.writeFile("/rules.pl", rulesAndFacts);
-  await executeClosedQuery(swi, "consult('/rules.pl').");
+  await loadPrologFiles(swi);
+  await executeClosedQuery(
+    swi,
+    `consult('/${[...PROLOG_ENTRYPOINT.path, PROLOG_ENTRYPOINT.file].join("/")}').`,
+  );
+  const loaded = await executeBoundQuery(swi, "rules:load_form(Facts).", {
+    Facts: mapFormToRows(form),
+  });
+  if (!loaded) throw new Error("Could not load form data into Prolog.");
 
   // solve_schedule_rows/1 unifies Schedule with the first timetable as rows.
   // An empty return list models the unsatisfiable case.
   const gen = executeOpenQuery<{ Schedule: ScheduleRow[] }>(swi)(
-    "solve_schedule_rows(Schedule).",
+    "rules:solve_schedule_rows(Schedule).",
   );
   const result = await gen.next();
 
@@ -33,82 +44,28 @@ export const processForm = async (form: Form): Promise<ScheduledClass[]> => {
   return mapScheduleRows(result.value.Schedule);
 };
 
-const getRules = async (): Promise<string> => {
-  const response = await fetch(base + "prolog/rules.pl");
-  if (!response.ok)
-    throw new Error(`Could not locate core rules file: ${response.statusText}`);
-  return await response.text();
-};
-
-const mapConstraintToFacts = (
-  slug: PrologSlug<"course">,
-  classCount: number,
-  c: CourseConstraint,
-): string[] => {
-  switch (c.type) {
-    case "double-block":
-      return classCount >= 2
-        ? [`course_constraint('${slug}', successive(1, 2)).`]
-        : [];
-    case "spread-days":
-      return Array.from(
-        { length: Math.max(0, classCount - 1) },
-        (_, index) =>
-          `course_constraint('${slug}', min_day_gap(${index + 1}, ${index + 2}, ${c.minGap ?? 0})).`,
-      );
-    case "successive":
-      return [
-        `course_constraint('${slug}', successive(${c.classA}, ${c.classB})).`,
-      ];
-    case "min_day_gap":
-      return [
-        `course_constraint('${slug}', min_day_gap(${c.classA}, ${c.classB}, ${c.gap})).`,
-      ];
-    default:
-      return [];
-  }
-};
-
-export const mapFormToFacts = (form: Form): string => {
-  const teacherSkillFacts = Array.from(form.teachers).flatMap(
-    ([slug, { skills }]) =>
-      Array.from(skills).map(
-        (skill) => `teacher_skill('${slug}', '${skill}').`,
-      ),
+const loadPrologFiles = async (swi: swipl.SWIPLModule): Promise<void> => {
+  const sources = await Promise.all(
+    PROLOG_FILES.map(async ({ path, file }) => {
+      const relativePath = [...path, file].join("/");
+      const response = await fetch(base + relativePath);
+      if (!response.ok)
+        throw new Error(
+          `Could not locate Prolog file ${relativePath}: ${response.statusText}`,
+        );
+      return { path, file, source: await response.text() };
+    }),
   );
 
-  const teacherAvailabilityFacts = Array.from(form.teachers).flatMap(
-    ([slug, { availableSlots }]) =>
-      Array.from(availableSlots).map((slotId) => {
-        const { dayNumber, period } = parseSlotId(slotId);
-        return `teacher_available('${slug}', slot(${dayNumber}, ${period})).`;
-      }),
-  );
+  const ensureDirectories = (path: readonly string[]): void => {
+    if (path.length === 0) return;
+    ensureDirectories(path.slice(0, -1));
+    const directory = `/${path.join("/")}`;
+    if (!swi.FS.analyzePath(directory).exists) swi.FS.mkdir(directory);
+  };
 
-  const courseRequiresFacts = Array.from(form.courses).flatMap(
-    ([slug, { skills }]) =>
-      Array.from(skills).map(
-        (skill) => `course_requires('${slug}', '${skill}').`,
-      ),
-  );
-
-  const courseClassFacts = Array.from(form.courses).map(
-    ([slug, { classCount }]) =>
-      `course_classes('${slug}', ${classCount ?? 1}).`,
-  );
-
-  const courseConstraintFacts = Array.from(form.courses).flatMap(
-    ([slug, { classCount, constraints }]) =>
-      (constraints ?? []).flatMap((c) =>
-        mapConstraintToFacts(slug, classCount, c),
-      ),
-  );
-
-  return [
-    ...teacherSkillFacts,
-    ...teacherAvailabilityFacts,
-    ...courseRequiresFacts,
-    ...courseClassFacts,
-    ...courseConstraintFacts,
-  ].join("\n");
+  sources.forEach(({ path, file, source }) => {
+    ensureDirectories(path);
+    swi.FS.writeFile(`/${[...path, file].join("/")}`, source);
+  });
 };

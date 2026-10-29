@@ -1,11 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { mapFormToFacts } from "../../src/functions/processForm";
+import { mapFormToRows } from "../../src/functions/formRows";
 import { mapScheduleRows } from "../../src/functions/scheduleRows";
 import type { Form } from "../../src/types/form";
 import type { PrologSlug } from "../../src/types/slugLabel";
 
-describe("mapFormToFacts", () => {
-  it("generates valid CLP(FD) facts matching Ticket 007 schema", () => {
+describe("mapFormToRows", () => {
+  it("maps skills, availability, courses, and constraints to tagged rows", () => {
     const form: Form = {
       skills: new Set(["math" as PrologSlug<"skill">]),
       teachers: new Map([
@@ -29,17 +29,17 @@ describe("mapFormToFacts", () => {
       ]),
     };
 
-    const facts = mapFormToFacts(form);
-
-    expect(facts).toContain("teacher_skill('mr_jansen', 'math').");
-    expect(facts).toContain("teacher_available('mr_jansen', slot(1, 1)).");
-    expect(facts).toContain("teacher_available('mr_jansen', slot(2, 3)).");
-    expect(facts).toContain("course_requires('algebra', 'math').");
-    expect(facts).toContain("course_classes('algebra', 2).");
-    expect(facts).toContain("course_constraint('algebra', successive(1, 2)).");
+    expect(mapFormToRows(form)).toEqual([
+      ["teacher_skill", "mr_jansen", "math"],
+      ["teacher_available", "mr_jansen", 1, 1],
+      ["teacher_available", "mr_jansen", 2, 3],
+      ["course_requires", "algebra", "math"],
+      ["course_classes", "algebra", 2],
+      ["course_constraint", "algebra", "successive", 1, 2],
+    ]);
   });
 
-  it("generates spread-days constraint facts properly", () => {
+  it("expands spread-days constraints into day-gap rows", () => {
     const form: Form = {
       skills: new Set(["math" as PrologSlug<"skill">]),
       teachers: new Map(),
@@ -55,14 +55,12 @@ describe("mapFormToFacts", () => {
       ]),
     };
 
-    const facts = mapFormToFacts(form);
-    expect(facts).toContain("course_classes('algebra', 3).");
-    expect(facts).toContain(
-      "course_constraint('algebra', min_day_gap(1, 2, 0)).",
-    );
-    expect(facts).toContain(
-      "course_constraint('algebra', min_day_gap(2, 3, 0)).",
-    );
+    expect(mapFormToRows(form)).toEqual([
+      ["course_requires", "algebra", "math"],
+      ["course_classes", "algebra", 3],
+      ["course_constraint", "algebra", "min_day_gap", 1, 2, 0],
+      ["course_constraint", "algebra", "min_day_gap", 2, 3, 0],
+    ]);
   });
 
   it("supports raw successive and min_day_gap constraints", () => {
@@ -83,10 +81,14 @@ describe("mapFormToFacts", () => {
       ]),
     };
 
-    const facts = mapFormToFacts(form);
-    expect(facts).toContain(
-      "course_constraint('algebra', min_day_gap(1, 2, 1)).",
-    );
+    expect(mapFormToRows(form)).toContainEqual([
+      "course_constraint",
+      "algebra",
+      "min_day_gap",
+      1,
+      2,
+      1,
+    ]);
   });
 });
 
