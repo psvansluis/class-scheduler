@@ -1,7 +1,7 @@
 <template>
   <CardHeader class="grid-cols-1 px-4 py-0">
     <div class="flex min-w-0 items-baseline justify-between gap-2">
-      <CardTitle class="min-w-0 truncate text-base font-semibold leading-none">
+      <CardTitle class="min-w-0 flex-1 text-base font-semibold leading-normal">
         <Label :for="toggleButtonId">
           {{ title }}
         </Label>
@@ -29,8 +29,8 @@
 
 <script setup lang="ts">
 import { CardHeader, CardTitle } from "@/components/ui/card";
-import CaretToggleButton from "./CaretToggleButton.vue";
 import Label from "./ui/label/Label.vue";
+import CaretToggleButton from "./CaretToggleButton.vue";
 import { useId } from "vue";
 
 defineProps<{
