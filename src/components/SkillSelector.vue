@@ -56,7 +56,6 @@ import { slugToLabel } from "../functions/slugify";
 import type { PrologSlug } from "../types/slugLabel";
 import SkillPill from "./SkillPill.vue";
 import { Label } from "@/components/ui/label";
-import "@material-design-icons/font";
 import {
   Select,
   SelectTrigger,

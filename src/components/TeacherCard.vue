@@ -4,8 +4,31 @@
     :style="cardStyle"
   >
     <CardHeader class="px-4 py-0">
-      <CardTitle class="text-base font-semibold">
-        {{ label }}
+      <CardTitle class="min-w-0 flex-1">
+        <Button
+          type="button"
+          variant="ghost"
+          class="h-auto w-full flex-col items-stretch gap-2 p-0 text-left hover:bg-transparent"
+          :aria-expanded="isExpanded"
+          :aria-controls="contentId"
+          @click="isExpanded = !isExpanded"
+        >
+          <span class="flex w-full min-w-0 items-center gap-2">
+            <span class="truncate text-base font-semibold">{{ label }}</span>
+            <PhCaretDown
+              :size="14"
+              class="ml-auto shrink-0 text-muted-foreground transition-transform duration-200"
+              :class="{ 'rotate-180': isExpanded }"
+            />
+          </span>
+          <span
+            v-if="!isExpanded"
+            class="flex w-full flex-wrap gap-x-3 gap-y-1 text-xs font-normal text-muted-foreground"
+          >
+            <span>{{ properties.skills.size }} skills</span>
+            <span>{{ slotCount }}/40 slots available</span>
+          </span>
+        </Button>
       </CardTitle>
       <CardAction>
         <Button
@@ -19,7 +42,7 @@
         </Button>
       </CardAction>
     </CardHeader>
-    <CardContent class="px-4 space-y-3">
+    <CardContent v-if="isExpanded" :id="contentId" class="px-4 space-y-3">
       <SkillSelector
         id="teacher-skill-selector"
         label="Skills"
@@ -65,7 +88,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, useId } from "vue";
 import { slugToLabel } from "../functions/slugify";
 import type { PrologSlug } from "../types/slugLabel";
 import type { TeacherProperties } from "../types/form";
@@ -94,7 +117,9 @@ const emit = defineEmits<{
   (e: "updateProperties", properties: TeacherProperties): void;
 }>();
 
+const isExpanded = ref(true);
 const isGridOpen = ref(true);
+const contentId = `teacher-card-content-${useId()}`;
 
 const slots = computed(() => props.properties.availableSlots);
 const slotCount = computed(() => slots.value.size);
