@@ -21,7 +21,7 @@
     </CardHeader>
     <CardContent class="px-4 space-y-3">
       <div class="space-y-1.5">
-        <span class="text-xs font-medium opacity-80">Skills</span>
+        <span class="text-s font-medium opacity-80">Skills</span>
         <SkillSelector
           :available-skills="availableSkills"
           :model-value="properties.skills"
@@ -32,14 +32,12 @@
       <!-- Availability Grid Section -->
       <div class="space-y-1.5 pt-1 border-t border-border/40">
         <div class="flex items-center justify-between">
-          <span class="text-xs font-medium opacity-80"
-            >Weekly Availability</span
-          >
+          <span class="text-s font-medium opacity-80">Weekly Availability</span>
           <Button
             type="button"
             variant="ghost"
             size="sm"
-            class="h-6 px-1.5 text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
+            class="h-6 px-1.5 text-s hover:text -foreground flex items-center gap-1"
             @click="isGridOpen = !isGridOpen"
           >
             <span>{{ slotCount }}/40 slots</span>

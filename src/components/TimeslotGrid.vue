@@ -1,23 +1,20 @@
 <template>
   <div class="timeslot-grid select-none space-y-2">
     <!-- Presets and counter -->
-    <div class="flex flex-wrap items-center justify-between gap-1.5 text-xs">
+    <div class="flex flex-wrap items-center justify-between gap-1.5">
       <div class="flex items-center gap-1">
         <Button
           v-for="preset in Object.keys(PRESET_SLOTS)"
           :key="preset"
           type="button"
           size="sm"
-          class="h-6 px-1.5 text-[11px]"
+          class="h-6 px-1.5"
           :disabled="disabled"
           @click="applyPreset(preset)"
         >
           {{ PRESET_SLOTS[preset].label }}
         </Button>
       </div>
-      <span class="font-mono text-muted-foreground text-[11px]">
-        {{ modelValue.size }}/40
-      </span>
     </div>
 
     <!-- 5x8 Matrix -->

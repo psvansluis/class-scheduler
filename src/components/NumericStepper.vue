@@ -21,7 +21,7 @@
         :aria-label="label"
         :data-testid="testId"
         :disabled="disabled"
-        class="h-7 border-0 px-7 font-mono text-xs font-semibold shadow-none focus-visible:ring-0"
+        class="h-7 border-0 px-7 font-mono shadow-none focus-visible:ring-0"
       />
       <NumberFieldIncrement
         :aria-label="`Increase ${label}`"
