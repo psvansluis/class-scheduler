@@ -3,19 +3,23 @@
     :id="id"
     type="button"
     variant="ghost"
-    size="sm"
-    class="h-6 px-1.5 text-xs font-normal text-muted-foreground hover:text-foreground flex items-center gap-1"
+    size="xs"
+    class="group h-6 px-1.5 text-xs font-normal leading-none text-muted-foreground hover:bg-transparent hover:text-foreground dark:hover:bg-transparent inline-flex items-center gap-1"
     :aria-label="label"
     :aria-expanded="expanded"
     :aria-controls="ariaControls"
     @click="$emit('toggle')"
   >
     <slot />
-    <PhCaretDown
-      :size="12"
-      class="shrink-0 transition-transform duration-200"
-      :class="{ 'rotate-180': expanded }"
-    />
+    <span
+      class="inline-flex shrink-0 rounded-md p-1.5 transition-colors group-hover:bg-accent group-focus-visible:bg-accent"
+    >
+      <PhCaretDown
+        :size="12"
+        class="transition-transform duration-200"
+        :class="{ 'rotate-180': expanded }"
+      />
+    </span>
   </Button>
 </template>
 

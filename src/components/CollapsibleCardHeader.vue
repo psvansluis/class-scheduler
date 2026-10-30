@@ -1,20 +1,22 @@
 <template>
-  <CardHeader class="px-4 py-0">
-    <CardTitle class="min-w-0 truncate text-base font-semibold">
-      <Label :for="toggleButtonId">
-        {{ title }}
-      </Label>
-    </CardTitle>
-    <CardAction class="flex items-center gap-1">
-      <CaretToggleButton
-        :id="toggleButtonId"
-        :expanded="expanded"
-        :label="`${expanded ? 'Collapse' : 'Expand'} ${title}`"
-        :aria-controls="contentId"
-        @toggle="$emit('update:expanded', !expanded)"
-      />
-      <slot name="actions" />
-    </CardAction>
+  <CardHeader class="grid-cols-1 px-4 py-0">
+    <div class="flex min-w-0 items-baseline justify-between gap-2">
+      <CardTitle class="min-w-0 truncate text-base font-semibold leading-none">
+        <Label :for="toggleButtonId">
+          {{ title }}
+        </Label>
+      </CardTitle>
+      <div class="flex shrink-0 items-baseline gap-1">
+        <CaretToggleButton
+          :id="toggleButtonId"
+          :expanded="expanded"
+          :label="`${expanded ? 'Collapse' : 'Expand'} ${title}`"
+          :aria-controls="contentId"
+          @toggle="$emit('update:expanded', !expanded)"
+        />
+        <slot name="actions" />
+      </div>
+    </div>
     <div
       v-if="!expanded"
       :id="`${contentId}-summary`"
@@ -26,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-import { CardAction, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardHeader, CardTitle } from "@/components/ui/card";
 import CaretToggleButton from "./CaretToggleButton.vue";
 import Label from "./ui/label/Label.vue";
 import { useId } from "vue";
