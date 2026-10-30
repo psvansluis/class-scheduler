@@ -20,11 +20,8 @@
       </CardAction>
     </CardHeader>
     <CardContent class="px-4 space-y-3">
-      <!-- Required Skills -->
       <div class="space-y-1.5">
-        <Label
-          for="course-skill-selector"
-          class="text-xs font-medium opacity-80"
+        <Label for="course-skill-selector" class="text-s font-medium opacity-80"
           >Required Skills</Label
         >
         <SkillSelector
@@ -35,45 +32,32 @@
         />
       </div>
 
-      <!-- Classes per week stepper -->
       <div class="space-y-1.5 pt-1 border-t border-border/40">
         <div class="flex items-center justify-between">
-          <NumberField
+          <NumericStepper
             id="course-class-count-field"
+            label="Classes per week"
+            test-id="class-count"
             :model-value="classCount"
             :min="1"
             :max="10"
-            :step="1"
-            :format-options="{ maximumFractionDigits: 0 }"
-            class="w-[7.5rem]"
             @update:model-value="updateClassCount"
           >
-            <Label
-              class="text-xs font-medium opacity-80"
-              for="course-class-count-field"
-            >
-              Classes / Week
-            </Label>
-            <NumberFieldContent>
-              <NumberFieldDecrement aria-label="Decrease classes per week">
-                <PhMinus :size="12" />
-              </NumberFieldDecrement>
-              <NumberFieldInput
-                aria-label="Classes per week"
-                class="h-7 border-0 px-7 font-mono text-xs font-semibold shadow-none focus-visible:ring-0"
-              />
-              <NumberFieldIncrement aria-label="Increase classes per week">
-                <PhPlus :size="12" />
-              </NumberFieldIncrement>
-            </NumberFieldContent>
-          </NumberField>
+            <template #label>
+              <Label
+                class="text-s font-medium opacity-80"
+                for="course-class-count-field"
+              >
+                Classes / Week
+              </Label>
+            </template>
+          </NumericStepper>
         </div>
       </div>
 
-      <!-- Spacing / Block Constraints -->
       <div class="space-y-1.5 pt-1 border-t border-border/40">
         <div class="flex items-center justify-between">
-          <span class="text-xs font-medium opacity-80">Constraints</span>
+          <span class="text-s font-medium opacity-80">Constraints</span>
           <span
             v-if="classCount < 2"
             class="text-[10px] text-muted-foreground italic"
@@ -81,25 +65,21 @@
             Requires 2+ classes
           </span>
         </div>
-        <div class="grid grid-cols-1 gap-1.5 pt-0.5">
-          <Button
-            v-for="constraint in constraintButtons"
-            :key="constraint.type"
-            type="button"
-            :disabled="constraint.disabled"
-            :class="[
-              'flex items-center justify-between rounded-md border px-2.5 py-1.5 text-xs text-left transition-colors cursor-pointer',
-              constraint.isActive
-                ? 'bg-primary/10 border-primary text-foreground font-medium'
-                : 'bg-background hover:bg-muted/50 border-border/60 text-muted-foreground',
-            ]"
-            @click="toggleConstraint(constraint.type)"
-          >
-            <span>{{ constraint.label }}</span>
-            <span v-if="constraint.isActive" class="text-foreground font-bold"
-              >✓</span
-            >
-          </Button>
+        <div class="grid grid-cols-1 gap-2 pt-0.5">
+          <div v-for="constraint in constraintFields" :key="constraint.type">
+            <CourseConstraintField
+              :id="constraint.id"
+              :label="constraint.label"
+              :test-id="constraint.testId"
+              :enabled="constraint.enabled"
+              :model-value="constraint.value"
+              :min="constraint.min"
+              :max="constraint.max"
+              :disabled="classCount < 2"
+              @update:enabled="constraint.toggle"
+              @update:model-value="constraint.update"
+            />
+          </div>
         </div>
       </div>
     </CardContent>
@@ -121,16 +101,11 @@ import {
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import {
-  NumberField,
-  NumberFieldContent,
-  NumberFieldDecrement,
-  NumberFieldIncrement,
-  NumberFieldInput,
-} from "@/components/ui/number-field";
-import { PhX, PhPlus, PhMinus } from "@phosphor-icons/vue";
+import { PhX } from "@phosphor-icons/vue";
 
 import SkillSelector from "./SkillSelector.vue";
+import CourseConstraintField from "./CourseConstraintField.vue";
+import NumericStepper from "./NumericStepper.vue";
 
 const props = defineProps<{
   slug: PrologSlug<"course">;
@@ -148,39 +123,45 @@ const constraints = computed(
   (): CourseConstraint[] => props.properties.constraints ?? [],
 );
 
-const isDoubleBlock = computed(() =>
-  constraints.value.some((c) => c.type === "double-block"),
+const blockLength = computed(
+  () =>
+    constraints.value.find((c) => c.type === "successive")?.blockLength ?? 2,
 );
+const dayGap = computed(
+  () => constraints.value.find((c) => c.type === "min_day_gap")?.gap ?? 0,
+);
+const constraintFields = computed(() => [
+  {
+    type: "successive" as const,
+    label: "Consecutive classes per block",
+    testId: "block-length",
+    id: `course-${props.slug}-block-length`,
+    value: blockLength.value,
+    enabled: constraints.value.some((c) => c.type === "successive"),
+    min: 2,
+    max: classCount.value,
+    toggle: toggleSuccessive,
+    update: updateSuccessiveLength,
+  },
+  {
+    type: "min_day_gap" as const,
+    label: "Full days between blocks",
+    testId: "day-gap",
+    id: `course-${props.slug}-day-gap`,
+    value: dayGap.value,
+    enabled: constraints.value.some((c) => c.type === "min_day_gap"),
+    min: 0,
+    max: 4,
+    toggle: toggleDayGap,
+    update: updateDayGap,
+  },
+]);
 
-const isSpreadDays = computed(() =>
-  constraints.value.some((c) => c.type === "spread-days"),
-);
-
-const constraintButtons = computed(
-  (): {
-    type: "double-block" | "spread-days";
-    label: string;
-    isActive: boolean;
-    disabled: boolean;
-  }[] => [
-    {
-      type: "double-block",
-      label: "Schedule as double-block",
-      isActive: isDoubleBlock.value,
-      disabled: classCount.value < 2,
-    },
-    {
-      type: "spread-days",
-      label: "Spread over different days",
-      isActive: isSpreadDays.value,
-      disabled: classCount.value < 2,
-    },
-  ],
-);
+const updateProperties = (properties: Partial<CourseProperties>) =>
+  emit("updateProperties", { ...props.properties, ...properties });
 
 const onUpdateSkills = (skills: Set<PrologSlug<"skill">>) => {
-  emit("updateProperties", {
-    ...props.properties,
+  updateProperties({
     skills,
     classCount: classCount.value,
     constraints: constraints.value,
@@ -193,23 +174,52 @@ const updateClassCount = (newCount: number | undefined) => {
   if (newCount < 2) {
     updatedConstraints = [];
   }
-  emit("updateProperties", {
-    ...props.properties,
+  updateProperties({
     classCount: newCount,
     constraints: updatedConstraints,
   });
 };
 
-const toggleConstraint = (type: "double-block" | "spread-days") => {
-  const isCurrentlyActive = constraints.value.some((c) => c.type === type);
-  const nextConstraints: CourseConstraint[] = isCurrentlyActive
-    ? []
-    : [{ type }];
-  emit("updateProperties", {
-    ...props.properties,
-    constraints: nextConstraints,
+const replaceConstraint = (nextConstraint: CourseConstraint) => {
+  const nextConstraints = constraints.value.filter(
+    (constraint) => constraint.type !== nextConstraint.type,
+  );
+  nextConstraints.push(nextConstraint);
+  updateProperties({ constraints: nextConstraints });
+};
+
+const removeConstraint = (type: CourseConstraint["type"]) =>
+  updateProperties({
+    constraints: constraints.value.filter(
+      (constraint) => constraint.type !== type,
+    ),
+  });
+
+const updateSuccessiveLength = (newValue: number | undefined) => {
+  if (newValue === undefined || !Number.isFinite(newValue)) return;
+  replaceConstraint({
+    type: "successive",
+    blockLength: Math.min(Math.max(Math.trunc(newValue), 2), classCount.value),
   });
 };
+
+const updateDayGap = (newValue: number | undefined) => {
+  if (newValue === undefined || !Number.isFinite(newValue)) return;
+  replaceConstraint({
+    type: "min_day_gap",
+    gap: Math.min(Math.max(Math.trunc(newValue), 0), 4),
+  });
+};
+
+const toggleSuccessive = (enabled: boolean) =>
+  enabled
+    ? replaceConstraint({ type: "successive", blockLength: blockLength.value })
+    : removeConstraint("successive");
+
+const toggleDayGap = (enabled: boolean) =>
+  enabled
+    ? replaceConstraint({ type: "min_day_gap", gap: dayGap.value })
+    : removeConstraint("min_day_gap");
 
 const label = computed(() => slugToLabel(props.slug).label);
 const slugToStyle = useSlugStyle();

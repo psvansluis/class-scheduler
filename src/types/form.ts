@@ -2,10 +2,8 @@ import type { PrologSlug } from "./slugLabel";
 import type { TimeslotId } from "../functions/timeslots";
 
 export type CourseConstraint =
-  | { type: "successive"; classA: number; classB: number }
-  | { type: "min_day_gap"; classA: number; classB: number; gap: number }
-  | { type: "double-block" }
-  | { type: "spread-days"; minGap?: number };
+  | { type: "successive"; blockLength: number }
+  | { type: "min_day_gap"; gap: number };
 
 export interface CourseProperties {
   skills: Set<PrologSlug<"skill">>;

@@ -21,42 +21,36 @@ const mapConstraintToRows = (
   course: PrologSlug<"course">,
   classCount: number,
   constraint: CourseConstraint,
+  blockLength: number,
 ): FormRow[] => {
   switch (constraint.type) {
-    case "double-block":
-      return classCount >= 2
-        ? [["course_constraint", course, "successive", 1, 2]]
-        : [];
-    case "spread-days":
-      return Array.from({ length: Math.max(0, classCount - 1) }, (_, index) => [
-        "course_constraint",
-        course,
-        "min_day_gap",
-        index + 1,
-        index + 2,
-        constraint.minGap ?? 0,
-      ]);
     case "successive":
-      return [
-        [
-          "course_constraint",
-          course,
-          "successive",
-          constraint.classA,
-          constraint.classB,
-        ],
-      ];
+      return Array.from(
+        { length: Math.floor(classCount / constraint.blockLength) },
+        (_, block) =>
+          Array.from(
+            { length: constraint.blockLength - 1 },
+            (_, offset): FormRow => [
+              "course_constraint",
+              course,
+              "successive",
+              block * constraint.blockLength + offset + 1,
+              block * constraint.blockLength + offset + 2,
+            ],
+          ),
+      ).flat();
     case "min_day_gap":
-      return [
-        [
+      return Array.from(
+        { length: Math.floor(classCount / blockLength) - 1 },
+        (_, block): FormRow => [
           "course_constraint",
           course,
           "min_day_gap",
-          constraint.classA,
-          constraint.classB,
+          (block + 1) * blockLength,
+          (block + 1) * blockLength + 1,
           constraint.gap,
         ],
-      ];
+      );
   }
 };
 
@@ -86,7 +80,13 @@ export const mapFormToRows = (form: Form): FormRow[] => [
   ]),
   ...Array.from(form.courses).flatMap(([course, { classCount, constraints }]) =>
     constraints.flatMap((constraint) =>
-      mapConstraintToRows(course, classCount, constraint),
+      mapConstraintToRows(
+        course,
+        classCount,
+        constraint,
+        constraints.find((item) => item.type === "successive")?.blockLength ??
+          1,
+      ),
     ),
   ),
 ];

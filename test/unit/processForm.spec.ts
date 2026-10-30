@@ -23,7 +23,7 @@ describe("mapFormToRows", () => {
           {
             skills: new Set(["math" as PrologSlug<"skill">]),
             classCount: 2,
-            constraints: [{ type: "double-block" }],
+            constraints: [{ type: "successive", blockLength: 2 }],
           },
         ],
       ]),
@@ -39,7 +39,7 @@ describe("mapFormToRows", () => {
     ]);
   });
 
-  it("expands spread-days constraints into day-gap rows", () => {
+  it("expands a block length and a gap between blocks into independent rows", () => {
     const form: Form = {
       skills: new Set(["math" as PrologSlug<"skill">]),
       teachers: new Map(),
@@ -48,8 +48,11 @@ describe("mapFormToRows", () => {
           "algebra" as PrologSlug<"course">,
           {
             skills: new Set(["math" as PrologSlug<"skill">]),
-            classCount: 3,
-            constraints: [{ type: "spread-days" }],
+            classCount: 6,
+            constraints: [
+              { type: "successive", blockLength: 3 },
+              { type: "min_day_gap", gap: 1 },
+            ],
           },
         ],
       ]),
@@ -57,9 +60,12 @@ describe("mapFormToRows", () => {
 
     expect(mapFormToRows(form)).toEqual([
       ["course_requires", "algebra", "math"],
-      ["course_classes", "algebra", 3],
-      ["course_constraint", "algebra", "min_day_gap", 1, 2, 0],
-      ["course_constraint", "algebra", "min_day_gap", 2, 3, 0],
+      ["course_classes", "algebra", 6],
+      ["course_constraint", "algebra", "successive", 1, 2],
+      ["course_constraint", "algebra", "successive", 2, 3],
+      ["course_constraint", "algebra", "successive", 4, 5],
+      ["course_constraint", "algebra", "successive", 5, 6],
+      ["course_constraint", "algebra", "min_day_gap", 3, 4, 1],
     ]);
   });
 
@@ -73,9 +79,7 @@ describe("mapFormToRows", () => {
           {
             skills: new Set(["math" as PrologSlug<"skill">]),
             classCount: 2,
-            constraints: [
-              { type: "min_day_gap", classA: 1, classB: 2, gap: 1 },
-            ],
+            constraints: [{ type: "min_day_gap", gap: 1 }],
           },
         ],
       ]),

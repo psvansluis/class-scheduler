@@ -1,6 +1,9 @@
 <template>
   <div
     class="rounded-md border border-border/60 bg-card p-1.5 space-y-1 shadow-2xs"
+    :data-day="scheduledClass.day"
+    :data-period="scheduledClass.period"
+    :data-class-index="scheduledClass.classIndex"
     :style="courseStyle"
   >
     <p class="truncate">{{ courseLabel }}</p>

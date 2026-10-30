@@ -25,7 +25,10 @@ describe("formCodec", () => {
           {
             skills: new Set([math]),
             classCount: 3,
-            constraints: [{ type: "spread-days" }],
+            constraints: [
+              { type: "successive", blockLength: 3 },
+              { type: "min_day_gap", gap: 1 },
+            ],
           },
         ],
       ]),
@@ -51,6 +54,9 @@ describe("formCodec", () => {
     expect(course).toBeDefined();
     expect(Array.from(course!.skills)).toEqual([math]);
     expect(course!.classCount).toBe(3);
-    expect(course!.constraints).toEqual([{ type: "spread-days" }]);
+    expect(course!.constraints).toEqual([
+      { type: "successive", blockLength: 3 },
+      { type: "min_day_gap", gap: 1 },
+    ]);
   });
 });
