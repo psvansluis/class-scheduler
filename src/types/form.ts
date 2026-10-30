@@ -1,4 +1,5 @@
-import type { PrologSlug } from "../types/slugLabel";
+import type { PrologSlug } from "./slugLabel";
+import type { TimeslotId } from "../functions/timeslots";
 
 export type CourseConstraint =
   | { type: "successive"; classA: number; classB: number }

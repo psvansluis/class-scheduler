@@ -61,7 +61,7 @@ const emit = defineEmits<{
 
 const modelValue = defineModel<string>({ default: "" });
 
-const isValid = computed<boolean>(() => {
+const isValid = computed<boolean>((): boolean => {
   const trimmed = modelValue.value.trim();
   return trimmed.length > 0 && trimmed === modelValue.value;
 });

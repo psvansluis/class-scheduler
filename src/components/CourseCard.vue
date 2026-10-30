@@ -107,7 +107,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, type ComputedRef } from "vue";
+import { computed } from "vue";
 import { slugToLabel } from "../functions/slugify";
 import type { PrologSlug } from "../types/slugLabel";
 import type { CourseConstraint, CourseProperties } from "../types/form";
@@ -144,7 +144,9 @@ const emit = defineEmits<{
 }>();
 
 const classCount = computed(() => props.properties.classCount ?? 1);
-const constraints = computed(() => props.properties.constraints ?? []);
+const constraints = computed(
+  (): CourseConstraint[] => props.properties.constraints ?? [],
+);
 
 const isDoubleBlock = computed(() =>
   constraints.value.some((c) => c.type === "double-block"),
@@ -154,28 +156,27 @@ const isSpreadDays = computed(() =>
   constraints.value.some((c) => c.type === "spread-days"),
 );
 
-const constraintButtons: ComputedRef<
-  {
+const constraintButtons = computed(
+  (): {
     type: "double-block" | "spread-days";
     label: string;
     isActive: boolean;
     disabled: boolean;
-  }[]
-> = computed(() => [
-  {
-    type: "double-block",
-    label: "Schedule as double-block",
-    isActive: isDoubleBlock.value,
-    disabled: classCount.value < 2,
-  },
-  {
-    type: "spread-days",
-    label: "Spread over different days",
-    description: "Requires 2+ classes",
-    isActive: isSpreadDays.value,
-    disabled: classCount.value < 2,
-  },
-]);
+  }[] => [
+    {
+      type: "double-block",
+      label: "Schedule as double-block",
+      isActive: isDoubleBlock.value,
+      disabled: classCount.value < 2,
+    },
+    {
+      type: "spread-days",
+      label: "Spread over different days",
+      isActive: isSpreadDays.value,
+      disabled: classCount.value < 2,
+    },
+  ],
+);
 
 const onUpdateSkills = (skills: Set<PrologSlug<"skill">>) => {
   emit("updateProperties", {

@@ -66,15 +66,15 @@ type IsPrologVariable<S extends string> = S extends `_${string}`
 
 type VisibleVariable<S extends string> = S extends `_${string}` ? never : S;
 
-type QueryVariables<Q extends string> = {
+export type QueryVariables<Q extends string> = {
   [K in Identifiers<Q>]: IsPrologVariable<K> extends true
     ? VisibleVariable<K>
     : never;
 }[Identifiers<Q>];
 
-type SameSet<A extends string, B extends string> = [Exclude<A, B>] extends [
-  never,
-]
+export type SameSet<A extends string, B extends string> = [
+  Exclude<A, B>,
+] extends [never]
   ? [Exclude<B, A>] extends [never]
     ? true
     : false
@@ -93,6 +93,6 @@ export type HasVariables<Q extends string> = [QueryVariables<Q>] extends [never]
   ? false
   : true;
 
-type QueryBindings<Q extends string> = {
+export type QueryBindings<Q extends string> = {
   [K in QueryVariables<Q>]: unknown;
 };

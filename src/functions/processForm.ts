@@ -1,5 +1,5 @@
-import type { Form } from "../types/form.d.ts";
-import type { ScheduleRow, ScheduledClass } from "../types/schedule.d.ts";
+import type { Form } from "../types/form";
+import type { ScheduleRow, ScheduledClass } from "../types/schedule";
 
 import {
   executeOpenQuery,
