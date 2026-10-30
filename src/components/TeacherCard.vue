@@ -3,34 +3,17 @@
     class="teacher-card py-4 gap-3 rounded-lg shadow-xs border-border"
     :style="cardStyle"
   >
-    <CardHeader class="px-4 py-0">
-      <CardTitle class="min-w-0 flex-1">
-        <Button
-          type="button"
-          variant="ghost"
-          class="h-auto w-full flex-col items-stretch gap-2 p-0 text-left hover:bg-transparent"
-          :aria-expanded="isExpanded"
-          :aria-controls="contentId"
-          @click="isExpanded = !isExpanded"
-        >
-          <span class="flex w-full min-w-0 items-center gap-2">
-            <span class="truncate text-base font-semibold">{{ label }}</span>
-            <PhCaretDown
-              :size="14"
-              class="ml-auto shrink-0 text-muted-foreground transition-transform duration-200"
-              :class="{ 'rotate-180': isExpanded }"
-            />
-          </span>
-          <span
-            v-if="!isExpanded"
-            class="flex w-full flex-wrap gap-x-3 gap-y-1 text-xs font-normal text-muted-foreground"
-          >
-            <span>{{ properties.skills.size }} skills</span>
-            <span>{{ slotCount }}/40 slots available</span>
-          </span>
-        </Button>
-      </CardTitle>
-      <CardAction>
+    <CollapsibleCardHeader
+      :title="label"
+      :expanded="isExpanded"
+      :content-id="contentId"
+      :summary="[
+        `${properties.skills.size} ${properties.skills.size === 1 ? 'skill' : 'skills'}`,
+        `${slotCount}/40 slots available`,
+      ]"
+      @update:expanded="isExpanded = $event"
+    >
+      <template #actions>
         <Button
           variant="ghost"
           size="icon-xs"
@@ -40,9 +23,9 @@
         >
           <PhX :size="14" weight="bold" />
         </Button>
-      </CardAction>
-    </CardHeader>
-    <CardContent v-if="isExpanded" :id="contentId" class="px-4 space-y-3">
+      </template>
+    </CollapsibleCardHeader>
+    <CardContent v-show="isExpanded" :id="contentId" class="px-4 space-y-3">
       <SkillSelector
         id="teacher-skill-selector"
         label="Skills"
@@ -56,24 +39,17 @@
         <div class="flex items-center justify-between">
           <Label
             for="availability-grid-toggle"
-            class="text-s font-medium opacity-80"
+            class="text-sm font-medium opacity-80"
             >Weekly Availability</Label
           >
-          <Button
+          <CaretToggleButton
             id="availability-grid-toggle"
-            type="button"
-            variant="ghost"
-            size="sm"
-            class="h-6 px-1.5 text-s hover:text -foreground flex items-center gap-1"
-            @click="isGridOpen = !isGridOpen"
+            label="Toggle weekly availability grid"
+            :expanded="isGridOpen"
+            @toggle="isGridOpen = !isGridOpen"
           >
             <span>{{ slotCount }}/40 slots</span>
-            <PhCaretDown
-              :size="12"
-              class="transition-transform duration-200"
-              :class="{ 'rotate-180': isGridOpen }"
-            />
-          </Button>
+          </CaretToggleButton>
         </div>
 
         <div v-show="isGridOpen" class="pt-1">
@@ -93,15 +69,11 @@ import { slugToLabel } from "../functions/slugify";
 import type { PrologSlug } from "../types/slugLabel";
 import type { TeacherProperties } from "../types/form";
 import { useSlugStyle } from "@/functions/useSlugStyle";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardAction,
-  CardContent,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { PhX, PhCaretDown } from "@phosphor-icons/vue";
+import { PhX } from "@phosphor-icons/vue";
+import CollapsibleCardHeader from "./CollapsibleCardHeader.vue";
+import CaretToggleButton from "./CaretToggleButton.vue";
 import SkillSelector from "./SkillSelector.vue";
 import TimeslotGrid from "./TimeslotGrid.vue";
 import type { TimeslotId } from "@/functions/timeslots.ts";

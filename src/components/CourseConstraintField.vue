@@ -10,7 +10,7 @@
       />
       <Label
         :for="`${id}-enabled`"
-        class="cursor-pointer text-s font-medium opacity-80"
+        class="cursor-pointer text-sm font-medium opacity-80"
       >
         {{ label }}
       </Label>

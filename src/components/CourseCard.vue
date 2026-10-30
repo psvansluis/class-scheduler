@@ -3,43 +3,18 @@
     class="course-card py-4 gap-3 rounded-lg shadow-xs border-border"
     :style="cardStyle"
   >
-    <CardHeader class="px-4 py-0">
-      <CardTitle class="min-w-0 flex-1">
-        <Button
-          type="button"
-          variant="ghost"
-          class="h-auto w-full flex-col items-stretch gap-2 p-0 text-left hover:bg-transparent"
-          :aria-expanded="isExpanded"
-          :aria-controls="contentId"
-          @click="isExpanded = !isExpanded"
-        >
-          <span class="flex w-full min-w-0 items-center gap-2">
-            <span class="truncate text-base font-semibold">{{ label }}</span>
-            <PhCaretDown
-              :size="14"
-              class="ml-auto shrink-0 text-muted-foreground transition-transform duration-200"
-              :class="{ 'rotate-180': isExpanded }"
-            />
-          </span>
-          <span
-            v-if="!isExpanded"
-            class="flex w-full flex-wrap gap-x-3 gap-y-1 text-xs font-normal text-muted-foreground"
-          >
-            <span>{{ properties.skills.size }} skills</span>
-            <span
-              >{{ classCount }}
-              {{ classCount === 1 ? "class" : "classes" }}/week</span
-            >
-            <span
-              >{{ enabledConstraintCount }}
-              {{
-                enabledConstraintCount === 1 ? "constraint" : "constraints"
-              }}</span
-            >
-          </span>
-        </Button>
-      </CardTitle>
-      <CardAction>
+    <CollapsibleCardHeader
+      :title="label"
+      :expanded="isExpanded"
+      :content-id="contentId"
+      :summary="[
+        `${properties.skills.size} ${properties.skills.size === 1 ? 'skill' : 'skills'}`,
+        `${classCount} ${classCount === 1 ? 'class' : 'classes'}/week`,
+        `${enabledConstraintCount} ${enabledConstraintCount === 1 ? 'constraint' : 'constraints'}`,
+      ]"
+      @update:expanded="isExpanded = $event"
+    >
+      <template #actions>
         <Button
           variant="ghost"
           size="icon-xs"
@@ -49,9 +24,9 @@
         >
           <PhX :size="14" weight="bold" />
         </Button>
-      </CardAction>
-    </CardHeader>
-    <CardContent v-if="isExpanded" :id="contentId" class="px-4 space-y-3">
+      </template>
+    </CollapsibleCardHeader>
+    <CardContent v-show="isExpanded" :id="contentId" class="px-4 space-y-3">
       <SkillSelector
         id="course-skill-selector"
         label="Required Skills"
@@ -73,7 +48,7 @@
           >
             <template #label>
               <Label
-                class="text-s font-medium opacity-80"
+                class="text-sm font-medium opacity-80"
                 for="course-class-count-field"
               >
                 Classes / Week
@@ -85,7 +60,7 @@
 
       <div class="space-y-1.5 pt-1 border-t border-border/40">
         <div class="flex items-center justify-between">
-          <span class="text-s font-medium opacity-80">Constraints</span>
+          <span class="text-sm font-medium opacity-80">Constraints</span>
           <span
             v-if="classCount < 2"
             class="text-[10px] text-muted-foreground italic"
@@ -120,16 +95,11 @@ import { slugToLabel } from "../functions/slugify";
 import type { PrologSlug } from "../types/slugLabel";
 import type { CourseConstraint, CourseProperties } from "../types/form";
 import { useSlugStyle } from "@/functions/useSlugStyle";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardAction,
-  CardContent,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { PhCaretDown, PhX } from "@phosphor-icons/vue";
+import { PhX } from "@phosphor-icons/vue";
+import CollapsibleCardHeader from "./CollapsibleCardHeader.vue";
 
 import SkillSelector from "./SkillSelector.vue";
 import CourseConstraintField from "./CourseConstraintField.vue";

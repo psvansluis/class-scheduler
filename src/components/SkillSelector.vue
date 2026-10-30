@@ -3,7 +3,7 @@
     <Label
       v-if="label"
       :for="selectorId"
-      class="text-s font-medium opacity-80"
+      class="text-sm font-medium opacity-80"
       @click.prevent="isOpen = true"
       >{{ label }}</Label
     >
