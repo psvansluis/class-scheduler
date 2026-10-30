@@ -1,11 +1,19 @@
 <template>
   <div class="flex flex-col gap-2 max-w-sm">
+    <Label
+      v-if="label"
+      :for="selectorId"
+      class="text-s font-medium opacity-80"
+      @click.prevent="isOpen = true"
+      >{{ label }}</Label
+    >
     <Select
       v-model="pendingSelection"
+      v-model:open="isOpen"
       :disabled="availableSkills.size === 0"
       @update:model-value="addSelected"
     >
-      <SelectTrigger class="w-full">
+      <SelectTrigger :id="selectorId" class="w-full">
         <SelectValue
           :placeholder="
             availableSkills.size === 0
@@ -43,10 +51,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref, useId } from "vue";
 import { slugToLabel } from "../functions/slugify";
 import type { PrologSlug } from "../types/slugLabel";
 import SkillPill from "./SkillPill.vue";
+import { Label } from "@/components/ui/label";
 import "@material-design-icons/font";
 import {
   Select,
@@ -56,14 +65,20 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 
-defineProps<{
+const props = defineProps<{
   availableSkills: Set<PrologSlug<"skill">>;
+  id?: string;
+  label?: string;
 }>();
+
+const generatedId = useId();
+const selectorId = computed(() => props.id ?? generatedId);
 
 const modelValue = defineModel<Set<PrologSlug<"skill">>>({
   default: () => new Set(),
 });
 
+const isOpen = ref(false);
 const pendingSelection = ref<PrologSlug<"skill"> | null>(null);
 
 const addSelected = () => {

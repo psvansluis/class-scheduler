@@ -20,20 +20,24 @@
       </CardAction>
     </CardHeader>
     <CardContent class="px-4 space-y-3">
-      <div class="space-y-1.5">
-        <span class="text-s font-medium opacity-80">Skills</span>
-        <SkillSelector
-          :available-skills="availableSkills"
-          :model-value="properties.skills"
-          @update:model-value="onUpdateSkills"
-        />
-      </div>
+      <SkillSelector
+        id="teacher-skill-selector"
+        label="Skills"
+        :available-skills="availableSkills"
+        :model-value="properties.skills"
+        @update:model-value="onUpdateSkills"
+      />
 
       <!-- Availability Grid Section -->
       <div class="space-y-1.5 pt-1 border-t border-border/40">
         <div class="flex items-center justify-between">
-          <span class="text-s font-medium opacity-80">Weekly Availability</span>
+          <Label
+            for="availability-grid-toggle"
+            class="text-s font-medium opacity-80"
+            >Weekly Availability</Label
+          >
           <Button
+            id="availability-grid-toggle"
             type="button"
             variant="ghost"
             size="sm"
@@ -95,19 +99,17 @@ const isGridOpen = ref(true);
 const slots = computed(() => props.properties.availableSlots);
 const slotCount = computed(() => slots.value.size);
 
-const onUpdateSkills = (skills: Set<PrologSlug<"skill">>) => {
+const onUpdateSkills = (skills: Set<PrologSlug<"skill">>) =>
   emit("updateProperties", {
     ...props.properties,
     skills,
   });
-};
 
-const onUpdateSlots = (availableSlots: Set<TimeslotId>) => {
+const onUpdateSlots = (availableSlots: Set<TimeslotId>) =>
   emit("updateProperties", {
     ...props.properties,
     availableSlots,
   });
-};
 
 const label = computed(() => slugToLabel(props.slug).label);
 const slugToStyle = useSlugStyle();

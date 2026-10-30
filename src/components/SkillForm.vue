@@ -1,5 +1,5 @@
 <template>
-  <div id="skill-form" class="space-y-3">
+  <div id="skill-form" class="space-y-4">
     <h3 class="text-lg font-semibold tracking-tight text-foreground">Skills</h3>
 
     <NameInput
@@ -11,14 +11,19 @@
       @button-pressed="commit"
     />
 
-    <div v-if="skills.size > 0" class="flex flex-wrap gap-1.5 pt-1">
-      <SkillPill
-        v-for="slug in skills"
-        :key="slug"
-        :slug="slug"
-        removable
-        @remove-skill="$emit('removeSkill', slug)"
-      />
+    <div v-if="skills.size > 0" class="space-y-2 pt-2">
+      <h4 class="text-sm font-medium text-muted-foreground">
+        Registered Skills
+      </h4>
+      <div class="flex flex-wrap gap-1.5 pt-1">
+        <SkillPill
+          v-for="slug in skills"
+          :key="slug"
+          :slug="slug"
+          removable
+          @remove-skill="$emit('removeSkill', slug)"
+        />
+      </div>
     </div>
   </div>
 </template>

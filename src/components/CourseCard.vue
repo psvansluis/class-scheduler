@@ -20,17 +20,13 @@
       </CardAction>
     </CardHeader>
     <CardContent class="px-4 space-y-3">
-      <div class="space-y-1.5">
-        <Label for="course-skill-selector" class="text-s font-medium opacity-80"
-          >Required Skills</Label
-        >
-        <SkillSelector
-          id="course-skill-selector"
-          :available-skills="availableSkills"
-          :model-value="properties.skills"
-          @update:model-value="onUpdateSkills"
-        />
-      </div>
+      <SkillSelector
+        id="course-skill-selector"
+        label="Required Skills"
+        :available-skills="availableSkills"
+        :model-value="properties.skills"
+        @update:model-value="onUpdateSkills"
+      />
 
       <div class="space-y-1.5 pt-1 border-t border-border/40">
         <div class="flex items-center justify-between">
@@ -160,23 +156,19 @@ const constraintFields = computed(() => [
 const updateProperties = (properties: Partial<CourseProperties>) =>
   emit("updateProperties", { ...props.properties, ...properties });
 
-const onUpdateSkills = (skills: Set<PrologSlug<"skill">>) => {
+const onUpdateSkills = (skills: Set<PrologSlug<"skill">>) =>
   updateProperties({
     skills,
     classCount: classCount.value,
     constraints: constraints.value,
   });
-};
 
 const updateClassCount = (newCount: number | undefined) => {
   if (newCount === undefined) return;
-  let updatedConstraints = constraints.value;
-  if (newCount < 2) {
-    updatedConstraints = [];
-  }
+  const newConstraints = newCount < 2 ? [] : constraints.value;
   updateProperties({
     classCount: newCount,
-    constraints: updatedConstraints,
+    constraints: newConstraints,
   });
 };
 
