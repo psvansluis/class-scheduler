@@ -66,7 +66,11 @@ const commit = () => {
   try {
     emit("updateCourse", {
       slug: labelToSlug(rawName.value as HumanLabel, "course"),
-      properties: { skills: new Set() },
+      properties: {
+        skills: new Set(),
+        classCount: 1,
+        constraints: [],
+      },
     });
     rawName.value = "";
   } catch (err) {

@@ -1,6 +1,70 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("Prolog Integration Engine", () => {
+  test("schedules two three-period blocks with a full day between them", async ({
+    page,
+  }) => {
+    await page.goto("./");
+    const skillForm = page.locator("#skill-form");
+    await skillForm.locator("#skill-name-input input").fill("math");
+    await skillForm.locator("button").click();
+    const teacherForm = page.locator("#teacher-form");
+    await teacherForm.locator("#teacher-name-input input").fill("Ms. Ada");
+    await teacherForm.locator("#teacher-name-input input").press("Enter");
+    const teacherCard = teacherForm.locator(".teacher-card");
+    await teacherCard.getByRole("combobox").click();
+    await page.getByRole("option", { name: "math" }).click();
+    const courseForm = page.locator("#course-form");
+    await courseForm.locator("#course-name-input input").fill("Algebra");
+    await courseForm.locator("#course-name-input button").click();
+    const courseCard = courseForm.locator(".course-card");
+    await courseCard.getByRole("combobox").click();
+    await page.getByRole("option", { name: "math" }).click();
+    const increment = courseCard.getByRole("button", {
+      name: "Increase classes per week",
+    });
+    for (let index = 0; index < 5; index++) await increment.click();
+    await courseCard
+      .getByRole("switch", { name: "Enable Consecutive classes per block" })
+      .click();
+    await courseCard
+      .getByRole("switch", { name: "Enable Full days between blocks" })
+      .click();
+    await courseCard
+      .getByRole("button", { name: "Increase Consecutive classes per block" })
+      .click();
+    await courseCard
+      .getByRole("button", { name: "Increase Full days between blocks" })
+      .click();
+    await page.getByRole("button", { name: "View Schedule" }).click();
+    const grid = page.locator("table");
+    await expect(grid).toBeVisible({ timeout: 10000 });
+    await expect(grid).toContainText("Algebra");
+    const cards = await page
+      .locator(".rounded-md.border[data-class-index]")
+      .evaluateAll((elements) =>
+        elements.map((element) => ({
+          day: Number(element.getAttribute("data-day")),
+          period: Number(element.getAttribute("data-period")),
+          index: Number(element.getAttribute("data-class-index")),
+        })),
+      );
+    expect(cards).toHaveLength(6);
+    const byIndex = new Map(cards.map((item) => [item.index, item]));
+    for (const start of [1, 4]) {
+      const block = Array.from({ length: 3 }, (_, offset) =>
+        byIndex.get(start + offset)!,
+      );
+      expect(block.every((item) => item.day === block[0].day)).toBe(true);
+      expect(block.map((item) => item.period)).toEqual([
+        block[0].period,
+        block[0].period + 1,
+        block[0].period + 2,
+      ]);
+    }
+    expect(byIndex.get(4)!.day - byIndex.get(3)!.day).toBeGreaterThanOrEqual(2);
+  });
+
   test("should load the website, fill out a form and successfully execute a SWI-Prolog query", async ({
     page,
   }) => {
@@ -57,9 +121,66 @@ test.describe("Prolog Integration Engine", () => {
       page.getByRole("heading", { name: "Generated Schedule Grid" }),
     ).toBeVisible();
 
-    const result = page.locator("p.can-teach-result");
+    const grid = page.locator("table");
+    await expect(grid).toBeVisible({ timeout: 10000 });
     for await (const text of ["Organic Chemistry 101", "Mr. Jansen"]) {
-      await expect(result).toContainText(text, { timeout: 7000 });
+      await expect(grid).toContainText(text);
     }
+  });
+
+  test("should assert that no conflict-free timetable could be found given incompatible course requirements and teacher skills", async ({
+    page,
+  }) => {
+    await page.goto("./");
+
+    await expect(page.locator("h1")).toHaveText("Declarative Class Scheduler");
+
+    // --- 1. Add Skills ---
+    const skillForm = page.locator("#skill-form");
+    for await (const skill of ["chemistry", "biology"]) {
+      await skillForm.locator("#skill-name-input input").fill(skill);
+      await skillForm.locator("#skill-name-input button").click();
+      await expect(
+        skillForm.locator(".skill-pill", { hasText: skill }),
+      ).toBeVisible();
+    }
+
+    // --- 2. Add Teacher with chemistry skill ---
+    const teacherForm = page.locator("#teacher-form");
+    await teacherForm.locator("#teacher-name-input input").fill("Mr. Jansen");
+    await teacherForm.locator("#teacher-name-input input").press("Enter");
+
+    const teacherCard = teacherForm.locator(".teacher-card");
+    await expect(teacherCard).toContainText("Mr. Jansen");
+    await teacherCard.getByRole("combobox").click();
+    await page.getByRole("option", { name: "chemistry" }).click();
+    await expect(teacherCard).toContainText("chemistry");
+
+    // --- 3. Add Course requiring biology skill ---
+    const courseForm = page.locator("#course-form");
+    await courseForm.locator("#course-name-input input").fill("Biology 101");
+    await courseForm.locator("#course-name-input button").click();
+
+    const courseCard = courseForm.locator(".course-card");
+    await expect(courseCard).toContainText("Biology 101");
+    await courseCard.getByRole("combobox").click();
+    await page.getByRole("option", { name: "biology" }).click();
+    await expect(courseCard).toContainText("biology");
+
+    // --- 4. Submit and Process Prolog Solution ---
+    await page.getByRole("button", { name: "View Schedule" }).click();
+
+    // Verify route hydration and UI resolution
+    await expect(
+      page.getByRole("heading", { name: "Generated Schedule Grid" }),
+    ).toBeVisible();
+
+    await expect(
+      page.getByText(
+        "No conflict-free timetable could be found. Try adding more teacher availability or relaxing course constraints.",
+      ),
+    ).toBeVisible({ timeout: 10000 });
+
+    await expect(page.locator("table")).toHaveCount(0);
   });
 });

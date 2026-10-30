@@ -3,6 +3,7 @@ import swipl from "swipl-wasm";
 import type {
   ClosedQuery,
   HasVariables,
+  OpenQuery,
   QueryBindings,
   QueryVariables,
   SameSet,
@@ -13,6 +14,19 @@ export async function executeClosedQuery<Q extends string = string>(
   queryString: Q & ClosedQuery<Q>,
 ): Promise<boolean> {
   const query = engine.prolog.query(queryString);
+  const result = (await query.once()) as { success: boolean } | null;
+  return result?.success === true;
+}
+
+export async function executeBoundQuery<
+  B extends Record<string, unknown>,
+  Q extends string,
+>(
+  engine: swipl.SWIPLModule,
+  queryString: Q & OpenQuery<B, Q>,
+  input: B,
+): Promise<boolean> {
+  const query = engine.prolog.query(queryString, input);
   const result = (await query.once()) as { success: boolean } | null;
   return result?.success === true;
 }

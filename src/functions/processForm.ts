@@ -1,53 +1,71 @@
-import type { Form } from "../types/form.d.ts";
-import type { PrologSlug } from "../types/slugLabel";
+import type { Form } from "../types/form";
+import type { ScheduleRow, ScheduledClass } from "../types/schedule";
 
-import { executeOpenQuery, executeClosedQuery } from "./executeQuery";
+import {
+  executeOpenQuery,
+  executeClosedQuery,
+  executeBoundQuery,
+} from "./executeQuery";
 import swipl from "swipl-wasm";
-import { slugToLabel } from "./slugify.ts";
+import { mapScheduleRows } from "./scheduleRows";
+import { mapFormToRows } from "./formRows";
 
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env?.BASE_URL ?? "/";
+const PROLOG_FILES = [
+  { path: ["prolog"], file: "rules.pl" },
+  { path: ["prolog", "domain"], file: "scheduler_domain.pl" },
+  { path: ["prolog", "adapters"], file: "schedule_io.pl" },
+] as const;
+const PROLOG_ENTRYPOINT = PROLOG_FILES[0];
 
-export const processForm = async (
-  form: Form,
-  factReceiver: string[],
-): Promise<void> => {
-  const rules = await getRules();
-  const facts = mapFormToFacts(form);
-
-  const rulesAndFacts = rules + "\n\n" + facts;
-
+export const processForm = async (form: Form): Promise<ScheduledClass[]> => {
   const swi = await swipl();
-  swi.FS.writeFile("/rules.pl", rulesAndFacts);
-  await executeClosedQuery(swi, "consult('/rules.pl').");
+  await loadPrologFiles(swi);
+  await executeClosedQuery(
+    swi,
+    `consult('/${[...PROLOG_ENTRYPOINT.path, PROLOG_ENTRYPOINT.file].join("/")}').`,
+  );
+  const loaded = await executeBoundQuery(swi, "rules:load_form(Facts).", {
+    Facts: mapFormToRows(form),
+  });
+  if (!loaded) throw new Error("Could not load form data into Prolog.");
 
-  for await (const { Teacher, Course } of executeOpenQuery<{
-    Teacher: PrologSlug<"teacher">;
-    Course: PrologSlug<"course">;
-  }>(swi)("can_teach(Teacher, Course).")) {
-    factReceiver.push(
-      `Teacher ${slugToLabel(Teacher).label} can teach ${slugToLabel(Course).label}`,
-    );
+  // solve_schedule_rows/1 unifies Schedule with the first timetable as rows.
+  // An empty return list models the unsatisfiable case.
+  const gen = executeOpenQuery<{ Schedule: ScheduleRow[] }>(swi)(
+    "rules:solve_schedule_rows(Schedule).",
+  );
+  const result = await gen.next();
+
+  if (result.done || !result.value) {
+    return [];
   }
+
+  return mapScheduleRows(result.value.Schedule);
 };
 
-const getRules = async (): Promise<string> => {
-  const response = await fetch(base + "prolog/rules.pl");
-  if (!response.ok)
-    throw new Error(`Could not locate core rules file: ${response.statusText}`);
-  return await response.text();
-};
+const loadPrologFiles = async (swi: swipl.SWIPLModule): Promise<void> => {
+  const sources = await Promise.all(
+    PROLOG_FILES.map(async ({ path, file }) => {
+      const relativePath = [...path, file].join("/");
+      const response = await fetch(base + relativePath);
+      if (!response.ok)
+        throw new Error(
+          `Could not locate Prolog file ${relativePath}: ${response.statusText}`,
+        );
+      return { path, file, source: await response.text() };
+    }),
+  );
 
-const mapFormToFacts = (form: Form): string => {
-  // const skillFacts = Array.from(form.skills).map((skill) => `skill(${skill}).`);
-  const teacherFacts = Array.from(form.teachers).flatMap(([slug, props]) =>
-    Array.from(props.skills).map(
-      (skill) => `teacher_skill('${slug}', '${skill}').`,
-    ),
-  );
-  const courseFacts = Array.from(form.courses).flatMap(([slug, props]) =>
-    Array.from(props.skills).map(
-      (skill) => `course_requires('${slug}', '${skill}').`,
-    ),
-  );
-  return [...teacherFacts, ...courseFacts].join("\n");
+  const ensureDirectories = (path: readonly string[]): void => {
+    if (path.length === 0) return;
+    ensureDirectories(path.slice(0, -1));
+    const directory = `/${path.join("/")}`;
+    if (!swi.FS.analyzePath(directory).exists) swi.FS.mkdir(directory);
+  };
+
+  sources.forEach(({ path, file, source }) => {
+    ensureDirectories(path);
+    swi.FS.writeFile(`/${[...path, file].join("/")}`, source);
+  });
 };

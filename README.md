@@ -27,22 +27,22 @@ Generating school or university timetables is a classical **Constraint Satisfact
 
 ## Architecture
 
-The application runs entirely client-side as a single-page application (SPA). When the user updates parameters and requests a schedule, the application compiles reactive form state into Prolog facts, mounts an in-memory virtual filesystem, and queries the WebAssembly Prolog engine.
+The application runs entirely client-side as a single-page application (SPA). When the user updates parameters and requests a schedule, the application maps reactive form state into typed rows, mounts the Prolog modules in an in-memory virtual filesystem, and passes the rows to the WebAssembly Prolog engine as query bindings.
 
 ```mermaid
 flowchart TD
     subgraph Browser["User's Browser (Client-Side SPA)"]
         UI["Vue 3 Reactive UI\n(Components & Router)"]
         State["State Codec\n(?state= Base64/JSON in URL)"]
-        Compiler["Fact Compiler\n(processForm.ts)"]
+        Compiler["Form Row Mapper\n(formRows.ts)"]
         WASM["SWI-Prolog WebAssembly Engine\n(swipl-wasm)"]
-        Rules["Prolog Rules File\n(rules.pl / clpfd)"]
+        Rules["Prolog Entry Point and Modules\n(rules.pl, domain, adapters)"]
         Output["Schedule Resolution View\n(ScheduleResult.vue)"]
 
         UI <-->|Bidirectional Sync| State
         UI -->|Form Submission| Compiler
-        Compiler -->|Inject Facts + Rules| WASM
-        Rules -.->|Mounted via Fetch / FS| WASM
+        Compiler -->|Tagged Rows as Query Bindings| WASM
+        Rules -.->|Loaded via Fetch / FS| WASM
         WASM -->|Yield Solution Stream| Output
     end
 ```
@@ -52,7 +52,7 @@ flowchart TD
 - **Vue 3 + TypeScript**: Built with the Composition API (`<script setup>`) and strict type definitions for robust domain safety.
 - **SWI-Prolog WASM**: Loads the full Prolog runtime into WebAssembly, running logical queries asynchronously without blocking the UI thread.
 - **State in URL**: Pure client-side persistence using `formCodec.ts` and `stateQuery.ts`. The state survives page refreshes and enables frictionless sharing via a single URL.
-- **Deterministic Asset Delivery**: A custom Vite dev/build plugin serves `prolog/rules.pl` during local development and bundles it deterministically into production releases.
+- **Deterministic Asset Delivery**: A custom Vite dev/build plugin serves the Prolog entry point and its modules during local development and bundles them deterministically into production releases.
 
 ---
 

@@ -1,31 +1,14 @@
 :- use_module(library(plunit)).
+:- use_module('../domain/scheduler_domain',
+	[ can_teach/2,
+	  replace_facts/1,
+	  solve_schedule/1
+	]).
 
-:- dynamic teacher_skill/2.
-:- dynamic course_requires/2.
-:- dynamic course_classes/2.
-:- dynamic course_constraint/2.
-:- dynamic teacher_available/2.
-
-% Explicitly scrub the global user namespace clean
-clear_db :-
-	retractall(user : teacher_skill(_, _)),
-	retractall(user : course_requires(_, _)),
-	retractall(user : course_classes(_, _)),
-	retractall(user : course_constraint(_, _)),
-	retractall(user : teacher_available(_, _)).
-
-% The macro helper - automatically forces a clear_db before injecting new facts
 given(Facts) :-
-	clear_db,
-	 inject_facts(Facts).
+	replace_facts(Facts).
 
-inject_facts([]) :-
-	!.
-inject_facts([Fact|Facts]) :-
-	asserta(user : Fact),
-	 inject_facts(Facts).
-
-:- begin_tests(scheduling_domain_tests).
+:- begin_tests(domain_tests).
 
 test(skills_match, [true(Teacher==mr_jansen)]) :-
 	given([teacher_skill(mr_jansen, math), course_requires(algebra, math)]),
@@ -121,4 +104,4 @@ test(multiple_courses_and_teachers, [nondet]) :-
 			slot(1, 1)),
 		Schedule).
 
-:- end_tests(scheduling_domain_tests).
+:- end_tests(domain_tests).

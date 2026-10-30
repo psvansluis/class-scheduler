@@ -1,6 +1,6 @@
 <template>
   <div
-    class="skill-pill group relative gap-2 p-2 inline-flex rounded-lg border border-border bg-card text-card-foreground text-sm shadow-xs transition-all px-3"
+    class="skill-pill group relative gap-2 p-2 inline-flex rounded-lg border border-border bg-card text-card-foreground shadow-xs transition-all px-3"
     :style="pillStyle"
   >
     <span class="pill-label whitespace-nowrap font-medium select-none">{{

@@ -42,6 +42,7 @@ import type { HumanLabel, PrologSlug } from "../types/slugLabel";
 import NameInput from "./NameInput.vue";
 import TeacherCard from "./TeacherCard.vue";
 import type { TeacherProperties } from "../types/form";
+import { PRESET_SLOTS } from "../functions/timeslots";
 
 defineProps<{
   skills: Set<PrologSlug<"skill">>;
@@ -64,7 +65,10 @@ const commit = () => {
   try {
     emit("updateTeacher", {
       slug: labelToSlug(rawName.value as HumanLabel, "teacher"),
-      properties: { skills: new Set() },
+      properties: {
+        skills: new Set(),
+        availableSlots: PRESET_SLOTS.all.values,
+      },
     });
     rawName.value = "";
   } catch (err) {
